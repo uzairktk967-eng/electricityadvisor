@@ -127,6 +127,60 @@ def extract_facts(text: str, phrase_map_path: str | Path | None = None) -> list[
                 0.95 if status == "confirmed" else 0.55, note
             ))
 
+    # Robust fallbacks for common complete-question phrasing. These patterns
+    # only bind numbers to explicit appliance/usage wording.
+    if not any(item.fact_id == "appliance.quantity" for item in candidates):
+        quantity_match = re.search(
+            rf"\b({NUMBER}|one|two|three|four|five|six|seven|eight|nine|ten)"
+            rf"\s+(?:(?:electric|ceiling|table|standing|pedestal|exhaust|room|window|split|inverter)\s+)*"
+            rf"(?:fans?|refrigerators?|fridges?|air\s+conditioners?|acs?|"
+            rf"washing\s+machines?|televisions?|tvs?|heaters?|irons?|pumps?|lights?|bulbs?)\b",
+            normalized,
+        )
+        if quantity_match:
+            raw = next((group for group in quantity_match.groups() if group is not None), None)
+            if raw is not None:
+                value = _number(raw)
+                status, note = _status_for_span(normalized, quantity_match.start(), quantity_match.end())
+                candidates.append(FactCandidate(
+                    "appliance.quantity", value, status, text,
+                    quantity_match.group(0), 0.95 if status == "confirmed" else 0.55, note
+                ))
+
+    if not any(item.fact_id == "usage.hours_per_day" for item in candidates):
+        hours_match = re.search(
+            rf"\b(?:run|runs|operate|operates|use|uses|used|work|works)"
+            rf"\s+(?:for\s+)?(?:approximately|approx\.?|around|about)?\s*"
+            rf"{NUMBER}\s*{HOURS}\s*(?:per\s+day|a\s+day|daily|each\s+day)\b",
+            normalized,
+        )
+        if hours_match:
+            raw = next((group for group in hours_match.groups() if group is not None), None)
+            if raw is not None:
+                value = _number(raw)
+                status, note = _status_for_span(normalized, hours_match.start(), hours_match.end())
+                candidates.append(FactCandidate(
+                    "usage.hours_per_day", value, status, text,
+                    hours_match.group(0), 0.95 if status == "confirmed" else 0.55, note
+                ))
+
+    if not any(item.fact_id == "usage.days_per_month" for item in candidates):
+        days_match = re.search(
+            rf"\bfor\s+{NUMBER}\s+days?\b",
+            normalized,
+        )
+        if days_match and ("monthly" in normalized or "per month" in normalized
+                           or "month" in normalized or "electricity consumption" in normalized):
+            raw = next((group for group in days_match.groups() if group is not None), None)
+            if raw is not None:
+                value = _number(raw)
+                status, note = _status_for_span(normalized, days_match.start(), days_match.end())
+                candidates.append(FactCandidate(
+                    "usage.days_per_month", value, status, text,
+                    days_match.group(0), 0.95 if status == "confirmed" else 0.55,
+                    note or "Interpreted as the monthly assessment period from the question context."
+                ))
+
     for entry in phrase_map.matches(normalized):
         fact_id = entry["fact"]
         value = entry.get("value")
