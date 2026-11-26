@@ -158,7 +158,7 @@
 - Added assessment-aware answers for confirmed input values, single-appliance consumption and cost, household totals, highest-consuming appliance, missing confirmed facts, and evidence conflicts.
 - Added explicit unknown-topic responses stating that unsupported subjects are not covered by the current knowledge base; the assistant must not guess.
 - Electrical warning symptoms retain a high-priority qualified-electrician referral.
-- Added nine regression tests for the new FAQ categories, confirmed-input reporting and unknown-topic refusal. The authored test suite count is now 79; tests have not been run and the deployed Streamlit app has not yet been verified.
+- Added eleven regression tests for the new FAQ categories, confirmed-input reporting and unknown-topic refusal. The authored test suite count is now 81; tests have not been run and the deployed Streamlit app has not yet been verified.
 - The response helper remains deterministic and local. It does not use an external LLM/API and is not an unrestricted chatbot. New topics must be added to the knowledge base and covered by tests before being advertised as supported.
 
 ## Verification status
