@@ -13,6 +13,8 @@ Every displayed finding must be derived by the inference engine. The consultatio
 
 The Streamlit layer may format these records, but it must not create a conclusion or recommendation independently.
 
+The conversational answer layer may translate supported results into plain-language explanations. It must use only the supplied assessment data and rule-linked recommendations, disclose missing inputs and estimate limitations, and refer electrical hazards to a qualified electrician. It is a deterministic, limited-domain response helper, not an unrestricted chatbot or a substitute for professional inspection.
+
 ## Evidence states
 
 | State | Meaning | Can satisfy a rule? |
