@@ -20,7 +20,7 @@
 | 7 | Knowledge-base management | **Implemented; runtime verification deferred until deployment** |
 | 8 | Explainability, validation and automated testing | **Implemented; runtime verification deferred until deployment** |
 | 9 | History, reports and exports | **Implemented; runtime verification deferred until deployment** |
-| 10 | Final audit, documentation and deployment readiness | Not started |
+| 10 | Final audit, documentation and deployment readiness | **Source audit complete; deployment/runtime verification pending** |
 
 ## Phase 1 — Repository audit and architecture
 
@@ -87,7 +87,7 @@
 - Added `docs/EXPLAINABILITY.md` defining the user-facing evidence states, trace fields, explanation contract, calculation disclosures and safety boundaries.
 - Added ten end-to-end consultation scenarios in `tests/test_end_to_end.py`, covering energy/cost calculations, missing tariff, explicit candidate review, conflicting and uncertain evidence, standby-specific power, safety referral, flexible schedules, energy labels and provenance.
 - Added `docs/TESTING.md` with test commands, acceptance criteria and regression/safety review guidance.
-- The complete authored test suite now contains 50 tests: inference (9), NLP (9), consultation (8), knowledge-base validation (6), end-to-end scenarios (10) and history/report exports (8).
+- The complete authored test suite now contains 51 tests: inference (9), NLP (9), consultation (8), knowledge-base validation (6), end-to-end scenarios (10) and history/report exports (9).
 - Tests have not been executed. Runtime verification remains deferred until Streamlit deployment, as requested; no test-pass claim is made.
 - Existing inference traces and consultation responses were retained as the explanation source; the UI is not permitted to invent independent conclusions or recommendations.
 
@@ -103,6 +103,17 @@
 - History and exports are generated in memory. No reports are stored on the app server; downloaded files are under the user's control.
 - Tests are authored but not executed, consistent with the agreed post-deployment verification plan.
 
+## Phase 10 — Final audit and deployment readiness
+
+- Reviewed source integration across the Streamlit entry point, consultation service, inference engine, fact store, knowledge-base loader/validator, history/report exports and test modules.
+- Fixed a structured-input type mismatch: integer facts such as appliance quantity now use integer-valued Streamlit number controls rather than passing floats to strict integer validation.
+- Strengthened CSV formula-injection mitigation to detect formula prefixes after leading whitespace and added a regression test.
+- Updated the Streamlit UI guide to reflect Phase 9 history/report functionality, integer input handling and the separate test-execution requirement.
+- Updated architecture component descriptions and added `docs/FINAL_AUDIT.md` with deployment configuration, Community Cloud instructions, resolved findings and runtime acceptance checklist.
+- Confirmed deployment configuration: root `app.py`, `main` branch, root `requirements.txt`, `.streamlit/config.toml`; recommended Community Cloud Python 3.12 selection. No secrets or external services are required by the current app.
+- Community Cloud does not run the repository's unit tests automatically. Full automated test execution remains deferred until deployment/runtime access, as agreed.
+- **Phase 10 source audit is complete; the app is prepared for deployment but not deployment-verified.** No app startup, browser interaction or test suite execution is claimed.
+
 ## Verification status
 
 - Phase 7 management code, UI and documentation were fetched back from GitHub during its implementation.
@@ -112,4 +123,4 @@
 
 ## Current next phase
 
-**Phase 10 — Final audit, documentation and deployment readiness.** Perform final source review, resolve identified integration issues, verify deployment configuration, and run the complete test suite after deployment/runtime access is available.
+**Phase 10 — Final audit and deployment readiness.** Source review and deployment documentation are complete. Deploy the app, complete the runtime acceptance checklist and execute all 51 tests before claiming final verification.
