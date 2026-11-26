@@ -73,7 +73,7 @@ NUMERIC_PATTERNS = {
         rf"each\s+month|in\s+the\s+month|monthly)"
     ),
     "tariff.price_per_kwh": re.compile(
-        rf"(?:tariff|rate|price)(?:\s+is|\s+of|\s*:|\s*=)?\s*"
+        rf"(?:tariff|rate|price|at)(?:\s+is|\s+of|\s*:|\s*=)?\s*"
         rf"(?:rs\.?\s*)?(?:rupees?\s*)?{NUMBER}\s*"
         rf"(?:rs\.?\s*)?(?:rupees?\s*)?(?:per\s*)?(?:kwh|unit)\b"
     ),
