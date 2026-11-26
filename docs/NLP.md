@@ -35,7 +35,11 @@ A candidate includes the fact ID, proposed value, evidence status, original inpu
 - Extraction never writes to `FactStore` and never fires inference rules.
 - Electrical warning phrases are flagged for professional referral; the NLP layer provides no repair instructions.
 
-## Limitations
+## Supported phrasing and boundaries
 
-This is a small deterministic vocabulary, not a general conversational model. It may miss paraphrases, ambiguous sentence structures, multiple appliances in one sentence, or negation outside its local context window. Candidate review is mandatory. Expand the phrase catalogue and tests only with documented domain examples.
+Numeric extraction recognizes common alternatives for rated power (for example, “rated at 80 W”), runtime (for example, “runs 10 hours daily” and “operates for 4.5 hours a day”), quantities including simple number words, days per month, and tariff wording such as “Rs. 55 per kWh”. Values remain candidates and require explicit user review.
+
+The current fact catalogue represents one appliance profile per consultation. Do not submit multiple different appliances with different wattages or runtimes as one paragraph: the existing single-value evidence model cannot safely associate each value with its appliance. Assess each appliance separately until a dedicated multi-appliance workflow is implemented.
+
+This remains a small deterministic vocabulary, not a general conversational model. It may miss unlisted paraphrases, ambiguous sentence structures, or negation outside its local context window. Candidate review is mandatory. Expand the phrase catalogue and tests only with documented domain examples.
 ```
