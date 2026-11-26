@@ -164,3 +164,13 @@
 **Phase 12 — Multi-appliance household assessment.** The source implementation calculates each appliance independently and aggregates household totals, variable cost and highest consumption. A previous 64-test revision passed in GitHub Actions; latest source revision and live Streamlit acceptance remain outstanding.
 
 **Phase 13 — Natural-language conversational answers.** Users can ask common questions in their own words and receive evidence-grounded conversational English answers. The current helper is deterministic and limited to supported question types; current-revision CI and live verification remain outstanding.
+
+
+## Phase 14 — Automatic assessment after fact review (implemented; runtime verification pending)
+
+- Fixed a confusing review workflow: confirming or rejecting the final extracted candidate now automatically runs the single-appliance rule-based assessment.
+- The resulting assessment is stored in session state and added to session history, then an evidence-grounded natural-language summary is shown automatically.
+- If not all extracted candidates have been reviewed, the system waits rather than assessing partially reviewed evidence.
+- If the assessment cannot run, the UI displays an explanatory message instead of silently leaving the user without a response.
+- The existing manual assessment button remains available for structured inputs and repeat assessments.
+- Updated app.py was fetched back from GitHub and checked for the automatic review-to-assessment flow. Automated tests and deployed Streamlit interaction have not yet been run; live verification remains pending.
