@@ -33,7 +33,7 @@ streamlit run app.py
 
 The Streamlit entry point is `app.py`. For Streamlit Community Cloud, select this repository, branch `main`, and main file path `app.py`. Dependencies are declared in the root `requirements.txt`.
 
-See [Streamlit UI and deployment notes](docs/STREAMLIT_UI.md), [Knowledge-Base Management](docs/KNOWLEDGE_BASE_MANAGEMENT.md), [History and Reports](docs/HISTORY_AND_REPORTS.md), and [Testing Plan](docs/TESTING.md).
+See [Streamlit UI and deployment notes](docs/STREAMLIT_UI.md), [Knowledge-Base Management](docs/KNOWLEDGE_BASE_MANAGEMENT.md), [History and Reports](docs/HISTORY_AND_REPORTS.md), and [Testing Plan](docs/TESTING.md), and [Final Audit and Deployment Guide](docs/FINAL_AUDIT.md).
 
 ## Architecture
 
@@ -42,7 +42,7 @@ See [Streamlit UI and deployment notes](docs/STREAMLIT_UI.md), [Knowledge-Base M
 - `nlp/`: constrained natural-language fact candidate extraction.
 - `consultation/`: review workflow, response assembly, session history snapshots and report exports.
 - `app.py`: Streamlit consultation and knowledge-base management interface.
-- `tests/`: authored unit tests for inference, NLP, consultation and knowledge-base validation.
+- `tests/`: authored unit, integration, end-to-end and report-export regression tests (51 total; execution pending deployment).
 
 The UI calls the consultation service; it does not implement its own reasoning rules.
 
