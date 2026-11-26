@@ -8,10 +8,12 @@ import zipfile
 import streamlit as st
 
 from consultation import ConsultationSession
+from consultation.history import build_history_entry, export_csv, export_html, export_json
 from knowledge_base import KNOWLEDGE_FILES, load_documents, validate_documents
 
 ROOT = Path(__file__).resolve().parent
 KNOWLEDGE_BASE = ROOT / "knowledge_base"
+MAX_HISTORY_ITEMS = 25
 
 st.set_page_config(
     page_title="Smart Home Electricity Advisor",
@@ -29,6 +31,8 @@ if "consultation" not in st.session_state:
     st.session_state.consultation = new_consultation()
 if "last_result" not in st.session_state:
     st.session_state.last_result = None
+if "consultation_history" not in st.session_state:
+    st.session_state.consultation_history = []
 
 session: ConsultationSession = st.session_state.consultation
 
@@ -218,7 +222,11 @@ if st.button("Find missing information"):
 st.subheader("5. Run the assessment")
 if st.button("Run electricity assessment", type="primary", use_container_width=True):
     try:
-        st.session_state.last_result = session.run()
+        assessment = session.run()
+        st.session_state.last_result = assessment
+        history_entry = build_history_entry(session, assessment)
+        st.session_state.consultation_history.insert(0, history_entry)
+        st.session_state.consultation_history = st.session_state.consultation_history[:MAX_HISTORY_ITEMS]
     except Exception as exc:
         st.error(f"The assessment could not be completed: {exc}")
 
@@ -298,6 +306,124 @@ if result is not None:
         "electricity bill. Fixed charges, taxes, slabs and adjustments may be excluded. "
         "Savings are not guaranteed."
     )
+
+st.divider()
+st.subheader("6. Consultation history and reports")
+history_items = st.session_state.consultation_history
+st.caption(
+    f"{len(history_items)} assessment(s) in this browser session. "
+    f"History is limited to the latest {MAX_HISTORY_ITEMS} assessments and is not durable storage."
+)
+if history_items:
+    history_labels = {
+        item["assessment_id"]: (
+            f"{item['created_at']} — "
+            f"{len(item['result'].get('conclusions', {}))} finding(s)"
+        )
+        for item in history_items
+    }
+    selected_history_id = st.selectbox(
+        "Choose a previous assessment",
+        list(history_labels),
+        format_func=lambda item_id: history_labels[item_id],
+        key="history_selection",
+    )
+    selected_entry = next(
+        item for item in history_items if item["assessment_id"] == selected_history_id
+    )
+    with st.expander("Previous assessment details", expanded=True):
+        st.write(f"**Assessment ID:** {selected_entry['assessment_id']}")
+        st.write(f"**Created (UTC):** {selected_entry['created_at']}")
+        old_result = selected_entry["result"]
+        if old_result.get("safety_notice"):
+            st.error(old_result["safety_notice"])
+        if old_result.get("conclusions"):
+            st.dataframe(
+                [
+                    {
+                        "Conclusion": conclusion_id,
+                        "Value": render_value(item.get("value"), item.get("unit")),
+                        "Caveat": item.get("caveat") or "",
+                    }
+                    for conclusion_id, item in old_result["conclusions"].items()
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+        else:
+            st.info("This assessment did not derive any conclusions.")
+        st.write(f"**Fired rules:** {', '.join(old_result.get('fired_rules', [])) or 'None'}")
+        st.write(f"**Recorded evidence entries:** {len(selected_entry.get('facts', []))}")
+
+    safe_id = selected_entry["assessment_id"]
+    json_report = export_json(selected_entry)
+    csv_report = export_csv(selected_entry)
+    html_report = export_html(selected_entry)
+    download_cols = st.columns(3)
+    with download_cols[0]:
+        st.download_button(
+            "Download JSON report",
+            data=json_report,
+            file_name=f"electricity-assessment-{safe_id}.json",
+            mime="application/json",
+            on_click="ignore",
+            use_container_width=True,
+        )
+    with download_cols[1]:
+        st.download_button(
+            "Download CSV report",
+            data=csv_report,
+            file_name=f"electricity-assessment-{safe_id}.csv",
+            mime="text/csv",
+            on_click="ignore",
+            use_container_width=True,
+        )
+    with download_cols[2]:
+        st.download_button(
+            "Download printable HTML",
+            data=html_report,
+            file_name=f"electricity-assessment-{safe_id}.html",
+            mime="text/html",
+            on_click="ignore",
+            use_container_width=True,
+        )
+    st.caption("Open the HTML report in a browser and choose Print → Save as PDF if you need a PDF copy.")
+
+    all_history_json = export_json({
+        "schema_version": "1.0",
+        "export_type": "session_history",
+        "assessment_count": len(history_items),
+        "assessments": history_items,
+    })
+    st.download_button(
+        "Export all session history (JSON)",
+        data=all_history_json,
+        file_name="electricity-advisor-session-history.json",
+        mime="application/json",
+        on_click="ignore",
+    )
+
+    remove_col, clear_col = st.columns(2)
+    with remove_col:
+        if st.button("Delete selected history item", use_container_width=True):
+            st.session_state.consultation_history = [
+                item for item in history_items
+                if item["assessment_id"] != safe_id
+            ]
+            st.rerun()
+    with clear_col:
+        if st.button("Clear all session history", use_container_width=True):
+            st.session_state.consultation_history = []
+            st.rerun()
+else:
+    st.info("Run an assessment to create the first history entry and downloadable report.")
+
+st.caption(
+    "Privacy: history is stored only in this active Streamlit session. It is not saved "
+    "to a database or shared between users. Exported reports are downloaded to your device; "
+    "keep them secure because they contain the values and evidence you entered. "
+    "Reloading or ending the session may clear history."
+)
 
 st.divider()
 st.caption(
