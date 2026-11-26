@@ -75,7 +75,7 @@
       "priority": 100,
       "conditions": [
         {
-          "fact": "appliance.measured_power_w",
+          "fact": "appliance.standby_power_w",
           "operator": "gte",
           "value": 0
         },
@@ -91,14 +91,14 @@
         }
       ],
       "conclusion": "standby.energy_estimate_available",
-      "formula": "measured_power_w * quantity * standby_hours_per_day * days_per_month / 1000",
+      "formula": "standby_power_w * quantity * standby_hours_per_day * days_per_month / 1000",
       "recommendations": [
         "rec.check_standby_controls"
       ],
       "explanation": "Standby energy can be estimated only when the power value specifically represents standby-mode power.",
       "threshold_basis": "dimensional_energy_calculation",
       "limitations": [
-        "The measured_power_w fact must be explicitly identified as standby-mode measurement for this rule; rated operating power is not a substitute."
+        "Use only a value measured or documented specifically for standby mode; rated operating power is not a substitute."
       ]
     },
     {
