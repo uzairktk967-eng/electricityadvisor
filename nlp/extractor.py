@@ -53,7 +53,7 @@ NUMERIC_PATTERNS = {
         rf"({NUMBER}|one|two|three|four|five|six|seven|eight|nine|ten)\b"
     ),
     "usage.hours_per_day": re.compile(
-        rf"(?<!standby\s)(?:used?\s+for|runs?\s+for|run\s+for|"
+        rf"(?<!standby\s)(?:used?\s+for|runs?\s*(?:for)?|run\s+for|"
         rf"operates?\s+for|operating\s+for|works?\s+for|"
         rf"usage(?:\s+time)?|operating\s+time)"
         rf"\s*(?:(?:is|of|for)\s*)?{NUMBER}\s*{HOURS}\s*{PER_DAY}\b"
