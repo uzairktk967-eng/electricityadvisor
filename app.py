@@ -1,10 +1,14 @@
 """Streamlit interface for the Smart Home Electricity Advisor."""
 
 from pathlib import Path
+import io
+import json
+import zipfile
 
 import streamlit as st
 
 from consultation import ConsultationSession
+from knowledge_base import KNOWLEDGE_FILES, load_documents, validate_documents
 
 ROOT = Path(__file__).resolve().parent
 KNOWLEDGE_BASE = ROOT / "knowledge_base"
@@ -301,3 +305,125 @@ st.caption(
     "and is not saved to a project database. Reloading or ending the session may clear it. "
     "The tool does not diagnose electrical faults or provide repair instructions."
 )
+
+
+st.divider()
+with st.expander("Knowledge-base Management", expanded=False):
+    st.write(
+        "Review or prepare changes to the project's JSON knowledge base. "
+        "Draft edits are session-only and never overwrite the active files."
+    )
+    if "kb_draft" not in st.session_state:
+        st.session_state.kb_draft = load_documents(KNOWLEDGE_BASE)
+    if "kb_editor_revision" not in st.session_state:
+        st.session_state.kb_editor_revision = 0
+    if "kb_validation" not in st.session_state:
+        st.session_state.kb_validation = None
+
+    draft_documents = st.session_state.kb_draft
+    document_names = list(KNOWLEDGE_FILES)
+    selected_document = st.selectbox(
+        "Knowledge-base document",
+        document_names,
+        format_func=lambda name: f"{name} — {KNOWLEDGE_FILES[name]}",
+    )
+
+    st.caption(
+        "The JSON Schema is a controlled validation contract and is not editable here. "
+        "Choose one of the five domain-data documents to prepare a draft."
+    )
+    with st.form(f"kb_editor_form_{selected_document}_{st.session_state.kb_editor_revision}"):
+        editor_text = st.text_area(
+            "JSON draft",
+            value=json.dumps(draft_documents[selected_document], indent=2, ensure_ascii=False),
+            height=360,
+            help="Edit the selected JSON document. Changes are held in this browser session until exported.",
+        )
+        save_draft = st.form_submit_button("Save changes to session draft")
+
+    if save_draft:
+        try:
+            parsed_document = json.loads(editor_text)
+            if not isinstance(parsed_document, dict):
+                raise ValueError("The document root must be a JSON object.")
+            st.session_state.kb_draft[selected_document] = parsed_document
+            st.session_state.kb_editor_revision += 1
+            st.session_state.kb_validation = None
+            st.success("Draft updated in this session. Validate the complete knowledge base before export.")
+            st.rerun()
+        except (json.JSONDecodeError, ValueError) as exc:
+            st.error(f"Draft was not saved: {exc}")
+
+    uploaded_document = st.file_uploader(
+        "Or upload replacement JSON for the selected document",
+        type=["json"],
+        key=f"kb_upload_{selected_document}",
+    )
+    if uploaded_document is not None and st.button(
+        "Load uploaded file into session draft",
+        key=f"kb_load_upload_{selected_document}",
+    ):
+        try:
+            uploaded_json = json.loads(uploaded_document.getvalue().decode("utf-8"))
+            if not isinstance(uploaded_json, dict):
+                raise ValueError("The uploaded document root must be a JSON object.")
+            st.session_state.kb_draft[selected_document] = uploaded_json
+            st.session_state.kb_editor_revision += 1
+            st.session_state.kb_validation = None
+            st.success("Uploaded JSON loaded into the session draft.")
+            st.rerun()
+        except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+            st.error(f"Upload was not accepted: {exc}")
+
+    if st.button("Validate complete knowledge base", type="primary"):
+        schema_path = KNOWLEDGE_BASE / "schema.json"
+        with schema_path.open("r", encoding="utf-8") as schema_file:
+            schema_document = json.load(schema_file)
+        st.session_state.kb_validation = validate_documents(
+            st.session_state.kb_draft,
+            schema_document,
+        )
+
+    validation = st.session_state.kb_validation
+    if validation is not None:
+        if validation.is_valid:
+            st.success("Validation passed. The complete draft set is structurally and semantically consistent.")
+        else:
+            st.error(f"Validation found {len(validation.errors)} error(s). Export is disabled.")
+            for issue in validation.errors:
+                st.write(f"- {issue}")
+        if validation.warnings:
+            st.warning(f"{len(validation.warnings)} warning(s)")
+            for warning in validation.warnings:
+                st.write(f"- {warning}")
+
+        if validation.is_valid:
+            bundle = io.BytesIO()
+            with zipfile.ZipFile(bundle, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
+                for filename in document_names:
+                    archive.writestr(
+                        filename,
+                        json.dumps(st.session_state.kb_draft[filename], indent=2, ensure_ascii=False) + "\\n",
+                    )
+                archive.writestr(
+                    "schema.json",
+                    (KNOWLEDGE_BASE / "schema.json").read_text(encoding="utf-8"),
+                )
+                archive.writestr(
+                    "VALIDATION.txt",
+                    "Knowledge-base draft passed JSON Schema and cross-file semantic validation.\\n"
+                    "Review the changes and apply them through the repository's normal Git workflow.\\n",
+                )
+            st.download_button(
+                "Download validated knowledge-base bundle",
+                data=bundle.getvalue(),
+                file_name="electricityadvisor-knowledge-base-draft.zip",
+                mime="application/zip",
+                use_container_width=True,
+            )
+
+    st.info(
+        "Safety and change control: this screen does not modify active knowledge-base files "
+        "or commit to GitHub. Drafts can be lost when the Streamlit session ends. "
+        "Review and commit exported changes through GitHub so the repository keeps an audit trail."
+    )
