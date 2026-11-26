@@ -13,10 +13,10 @@
 |---|---|---|
 | 1 | Repository audit and architecture | **Complete** |
 | 2 | Knowledge-base engineering | **Complete** |
-| 3 | Core inference engine (forward/backward chaining, matching, conflict handling) | **Implemented; runtime verification deferred until deployment** |
-| 4 | Lightweight natural-language processing | **Implemented; runtime verification pending** |
-| 5 | Consultation and response engine | Next |
-| 6 | Streamlit professional UI | Not started |
+| 3 | Core inference engine | **Implemented; runtime verification deferred until deployment** |
+| 4 | Lightweight natural-language processing | **Implemented; runtime verification deferred until deployment** |
+| 5 | Consultation and response engine | **Implemented; runtime verification deferred until deployment** |
+| 6 | Streamlit professional UI | Next |
 | 7 | Knowledge-base management | Not started |
 | 8 | Explainability, validation and automated testing | Not started |
 | 9 | History, reports and exports | Not started |
@@ -41,34 +41,37 @@
 
 ## Phase 3 — Core inference engine
 
-### Deliverables
-- Added `expert_system/fact_store.py` for typed fact validation, provenance, evidence states and contradictory confirmed-value detection.
-- Added `expert_system/engine.py` for JSON knowledge-base loading, typed rule matching, forward chaining, backward chaining, allow-listed calculations, priority ordering and inference traces.
-- Added `expert_system/models.py` and package exports.
-- Added nine standard-library unit tests covering energy/cost calculation, uncertain and rejected evidence, safety referral, standby-specific measurement, contradictory evidence, backward chaining and type validation.
-- Added `docs/INFERENCE_ENGINE.md`.
-- Formula metadata is never evaluated using Python `eval`; only explicitly registered rule IDs are calculated.
-
-### Verification status
-- The nine tests are authored but have not been executed.
-- A local clone/test attempt was blocked because the execution environment could not resolve `github.com`.
-- Per the developer's chosen workflow, runtime verification of Phases 3 and 4 will be performed after the Streamlit application is deployed. Until then, no test pass is claimed.
+- Added typed facts, evidence statuses, provenance, contradictory confirmed-value detection, forward chaining, backward chaining, deterministic rule matching and inference traces.
+- Added allow-listed calculations for monthly energy, variable energy cost and standby energy. Formula metadata is never evaluated using Python `eval`.
+- Added nine standard-library unit tests and `docs/INFERENCE_ENGINE.md`.
+- Tests are authored but not executed; runtime verification is deferred until Streamlit deployment at the developer's request.
 
 ## Phase 4 — Lightweight natural-language processing
 
+- Added text normalization, tokenization, controlled phrase mapping and a versioned phrase catalogue.
+- Added extraction for appliance names, explicit numeric power/usage/tariff values, energy-label availability, flexible schedules and electrical warning symptoms.
+- Candidates retain source text, matched text, evidence status, confidence indicator and notes.
+- Uncertainty and local negation are handled conservatively. Extraction does not write facts or run inference.
+- Added nine NLP tests and `docs/NLP.md`.
+- Tests are authored but not executed; runtime verification is deferred until Streamlit deployment.
+
+## Phase 5 — Consultation and response engine
+
 ### Deliverables
-- Added `nlp/normalizer.py` for Unicode/case normalization, whitespace cleanup and tokenization.
-- Added `nlp/phrase_map.py` and versioned `nlp/domain_phrases.json` for controlled domain vocabulary.
-- Added `nlp/extractor.py` to extract explicit appliance, numeric, usage, tariff, schedule, label and electrical-symptom fact candidates.
-- Added local negation and uncertainty handling. Extracted facts retain source text, matched text, status, confidence indicator and note.
-- Extraction returns candidates only; it does not write to the fact store, infer conclusions or diagnose faults. User confirmation is required before candidates are used by the inference engine.
-- Added `tests/test_nlp.py` and `docs/NLP.md`.
-- Numeric parsing preserves grouped thousands (for example, 1,500 W) rather than interpreting it as a decimal.
+- Added `consultation/session.py` and package exports.
+- Added a single-consultation workflow that coordinates NLP candidates, explicit user review, the fact store and inference engine.
+- Extracted candidates remain outside the fact store until a user confirms or rejects them. Each reviewed candidate records its source and review note; duplicate review is blocked.
+- Added validated structured fact entry for direct user input.
+- Added evidence summaries and backward-chaining prompts for missing facts, including energy, cost and standby inputs.
+- Added a response assembler that returns only derived conclusions, fired rules, explanations, limitations, rule-linked recommendations and unresolved conflicts.
+- Added a conservative safety notice when the electrical-symptom rule fires.
+- Added eight consultation unit tests and `docs/CONSULTATION.md`.
 
 ### Verification status
-- Nine NLP unit tests are authored but have not been executed.
-- Runtime verification is deferred until Streamlit deployment, as agreed with the developer.
+- The Phase 3, 4 and 5 test suites contain 26 authored tests in total (9 inference, 9 NLP, 8 consultation).
+- None have been executed in this environment. Runtime verification is deferred until Streamlit deployment, as agreed. No test pass is claimed.
+- Consultation state is currently in memory and is lost when the process ends. Persistence/history is outside this phase.
 
 ## Current next phase
 
-**Phase 5 — Consultation and response engine.** It will connect reviewed NLP candidates to the fact store and inference engine, ask for missing or ambiguous inputs, and assemble evidence-based explanations. Do not start Phase 6 until Phase 5 is completed and documented.
+**Phase 6 — Streamlit user interface.** Build a user-facing consultation flow with candidate confirmation, structured inputs, missing-information prompts, results, explanations and safety messaging. Keep reasoning logic in the existing independent packages. Do not begin Phase 7 until Phase 6 is completed and documented.
