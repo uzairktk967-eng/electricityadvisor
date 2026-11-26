@@ -16,8 +16,8 @@
 | 3 | Core inference engine | **Implemented; runtime verification deferred until deployment** |
 | 4 | Lightweight natural-language processing | **Implemented; runtime verification deferred until deployment** |
 | 5 | Consultation and response engine | **Implemented; runtime verification deferred until deployment** |
-| 6 | Streamlit professional UI | Next |
-| 7 | Knowledge-base management | Not started |
+| 6 | Streamlit professional UI | **Implemented; runtime verification deferred until deployment** |
+| 7 | Knowledge-base management | Next |
 | 8 | Explainability, validation and automated testing | Not started |
 | 9 | History, reports and exports | Not started |
 | 10 | Final audit, documentation and deployment readiness | Not started |
@@ -57,21 +57,32 @@
 
 ## Phase 5 — Consultation and response engine
 
-### Deliverables
 - Added `consultation/session.py` and package exports.
-- Added a single-consultation workflow that coordinates NLP candidates, explicit user review, the fact store and inference engine.
+- Added a single-consultation workflow coordinating NLP candidates, explicit user review, the fact store and inference engine.
 - Extracted candidates remain outside the fact store until a user confirms or rejects them. Each reviewed candidate records its source and review note; duplicate review is blocked.
-- Added validated structured fact entry for direct user input.
-- Added evidence summaries and backward-chaining prompts for missing facts, including energy, cost and standby inputs.
-- Added a response assembler that returns only derived conclusions, fired rules, explanations, limitations, rule-linked recommendations and unresolved conflicts.
-- Added a conservative safety notice when the electrical-symptom rule fires.
+- Added validated structured fact entry, evidence summaries and backward-chaining prompts for missing facts.
+- Added a response assembler returning derived conclusions, fired rules, explanations, limitations, rule-linked recommendations, unresolved conflicts and safety notices.
 - Added eight consultation unit tests and `docs/CONSULTATION.md`.
 
+## Phase 6 — Streamlit user interface
+
+### Deliverables
+- Added root entry point `app.py` and pinned the Streamlit dependency in `requirements.txt`.
+- Added a Streamlit theme configuration in `.streamlit/config.toml`.
+- Added a natural-language description form and explicit candidate review controls. Negated candidates are labelled to make their review semantics clear.
+- Added a structured fact-entry form generated from the existing fact catalogue, including numeric, string, boolean and enumerated values.
+- Added missing-information prompts for monthly energy, variable cost and standby estimates.
+- Added result presentation for rule-supported findings, caveats, evidence status, conflicts, explanations, limitations, recommendations and safety notices.
+- Added clear disclosures that cost is a variable estimate rather than the complete bill, savings are not guaranteed, and the app does not diagnose electrical faults.
+- Kept the reasoning and consultation logic in the existing independent packages; the UI is a presentation layer.
+- Updated the README and added `docs/STREAMLIT_UI.md` with local run and Community Cloud deployment guidance.
+
 ### Verification status
-- The Phase 3, 4 and 5 test suites contain 26 authored tests in total (9 inference, 9 NLP, 8 consultation).
-- None have been executed in this environment. Runtime verification is deferred until Streamlit deployment, as agreed. No test pass is claimed.
-- Consultation state is currently in memory and is lost when the process ends. Persistence/history is outside this phase.
+- Phase 6 source and documentation files were committed and fetched back from GitHub for review.
+- The app has not been launched and no automated tests have been run, in accordance with the developer's plan to test after deployment.
+- Phases 3–5 still contain 26 authored tests; their execution remains deferred. No test-pass claim is made.
+- Consultation state remains session-only and is not stored in a database.
 
 ## Current next phase
 
-**Phase 6 — Streamlit user interface.** Build a user-facing consultation flow with candidate confirmation, structured inputs, missing-information prompts, results, explanations and safety messaging. Keep reasoning logic in the existing independent packages. Do not begin Phase 7 until Phase 6 is completed and documented.
+**Phase 7 — Knowledge-base management.** Add safe, validated workflows for reviewing and maintaining the JSON knowledge base. Do not begin Phase 8 until Phase 7 is completed and documented.
