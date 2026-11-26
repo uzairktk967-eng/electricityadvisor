@@ -1,0 +1,50 @@
+{
+  "version": "1.0.0",
+  "conclusions": [
+    {
+      "id": "energy.monthly_kwh_estimate_available",
+      "category": "consumption_estimation",
+      "description": "A monthly energy estimate can be calculated from valid power, quantity and usage inputs.",
+      "output_type": "number",
+      "unit": "kWh/month",
+      "caveat": "Estimate assumes the entered power is representative during the stated operating hours."
+    },
+    {
+      "id": "cost.monthly_variable_estimate_available",
+      "category": "cost_estimation",
+      "description": "A variable energy-cost estimate can be calculated from estimated kWh and a user-entered rate.",
+      "output_type": "number",
+      "unit": "currency/month",
+      "caveat": "Excludes fixed charges, taxes, slabs, duties, adjustments and other bill components unless included in the entered rate."
+    },
+    {
+      "id": "standby.energy_estimate_available",
+      "category": "standby_consumption",
+      "description": "A standby-energy estimate can be calculated when standby power is known or measured.",
+      "output_type": "number",
+      "unit": "kWh/month",
+      "caveat": "Do not assume standby power equals rated operating power; obtain a standby measurement or manufacturer value."
+    },
+    {
+      "id": "usage.schedule_review_candidate",
+      "category": "usage_optimization",
+      "description": "The user may be able to review operating schedules where usage is flexible.",
+      "output_type": "boolean",
+      "caveat": "A review candidate is not proof of waste or guaranteed savings."
+    },
+    {
+      "id": "safety.professional_inspection_required",
+      "category": "electrical_safety",
+      "description": "A reported electrical warning symptom warrants stopping use where safe and seeking a qualified electrician.",
+      "output_type": "boolean",
+      "caveat": "The system does not diagnose wiring faults or provide repair instructions."
+    },
+    {
+      "id": "efficiency.specification_comparison_advised",
+      "category": "appliance_efficiency",
+      "description": "Compare verified energy labels or manufacturer specifications before judging appliance efficiency.",
+      "output_type": "boolean",
+      "caveat": "Do not infer efficiency from appliance age, brand or rated wattage alone."
+    }
+  ]
+}
