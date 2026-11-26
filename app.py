@@ -49,6 +49,7 @@ session: ConsultationSession = st.session_state.consultation
 
 def clear_result() -> None:
     st.session_state.last_result = None
+    st.session_state.natural_answer = None
 
 
 def render_value(value, unit: str | None = None) -> str:
@@ -74,6 +75,7 @@ with st.sidebar:
         st.session_state.consultation = new_consultation()
         st.session_state.last_result = None
         st.session_state.last_multi_result = None
+        st.session_state.natural_answer = None
         st.session_state.multi_appliance_rows = [{"id": 1}]
         st.session_state.next_multi_appliance_id = 2
         st.rerun()
