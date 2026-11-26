@@ -21,6 +21,7 @@
 | 8 | Explainability, validation and automated testing | **Implemented; runtime verification deferred until deployment** |
 | 9 | History, reports and exports | **Implemented; runtime verification deferred until deployment** |
 | 10 | Final audit, documentation and deployment readiness | **Source audit complete; deployment/runtime verification pending** |
+| 11 | Post-deployment bug fixing: NLP robustness and input validation | **In progress; multi-appliance workflow and full regression verification pending** |
 
 ## Phase 1 — Repository audit and architecture
 
@@ -114,6 +115,16 @@
 - Community Cloud does not run the repository's unit tests automatically. Full automated test execution remains deferred until deployment/runtime access, as agreed.
 - **Phase 10 source audit is complete; the app is prepared for deployment but not deployment-verified.** No app startup, browser interaction or test suite execution is claimed.
 
+## Phase 11 — Post-deployment bug fixing (in progress)
+
+- Investigated the live-use report where a natural-language appliance description produced no extracted facts.
+- Expanded deterministic numeric phrase patterns to recognize common single-appliance wording: “rated at 80 W”, “runs 10 hours daily”, “operates for 4.5 hours a day”, simple number-word quantities, days-per-month wording and Pakistani rupee tariff phrasing.
+- Added three NLP regression tests covering common paraphrases, word quantities and daily/monthly usage wording. The authored test count is now 54; tests have not yet been executed.
+- Corrected the knowledge-base type for appliance quantity from a general number to an integer, so fractional appliance counts are rejected and the Streamlit integer input path is used.
+- Added a visible UI limitation notice: the current fact model safely supports one appliance profile at a time. Multiple different appliances cannot yet be represented as independent rows; combining them in one paragraph could incorrectly associate wattage/runtime values.
+- Updated NLP documentation to state the expanded phrase coverage and the single-appliance boundary.
+- Remaining work: implement a properly separated multi-appliance workflow, audit other input/engine/UI/report edge cases, execute regression tests, fix failures, and repeat the live acceptance checks.
+
 ## Verification status
 
 - Phase 7 management code, UI and documentation were fetched back from GitHub during its implementation.
@@ -123,4 +134,4 @@
 
 ## Current next phase
 
-**Phase 10 — Final audit and deployment readiness.** Source review and deployment documentation are complete. Deploy the app, complete the runtime acceptance checklist and execute all 51 tests before claiming final verification.
+**Phase 11 — Post-deployment bug fixing.** Single-appliance NLP coverage and quantity typing have been improved. Multi-appliance support, full regression execution and deployed runtime verification remain outstanding.
