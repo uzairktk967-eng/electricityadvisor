@@ -141,6 +141,6 @@ The NLP package uses a limited deterministic vocabulary and explicit patterns. I
 - **Phase 7:** Implement safe knowledge-base draft editing, JSON Schema and semantic validation, and validated bundle export — implemented; runtime verification deferred until deployment.
 - **Phase 8:** Document the explanation contract, add end-to-end scenario coverage and provide a reproducible testing plan — implemented; test execution deferred until deployment.
 - **Phase 9:** Add bounded session history, immutable report snapshots, JSON/CSV/printable HTML exports, output escaping and privacy disclosures — implemented; runtime verification deferred until deployment.
-- **Phase 10:** Final source/security audit, deployment readiness, full test execution and documented runtime verification — next.
+- **Phase 10:** Final source/security audit, deployment readiness and documented runtime checklist — source audit complete; Community Cloud deployment, runtime acceptance and full test execution remain pending.
 
 A component is implemented only when its source code and documentation exist. Test execution status must be reported separately; authored tests must never be described as passing until they have actually run.
