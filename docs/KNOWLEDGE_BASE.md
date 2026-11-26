@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Phase 2 establishes a versioned, explainable JSON knowledge base for the Smart Home Electricity Advisor. These records are domain knowledge definitions, not executable code. The inference engine will be implemented in a later phase.
+The project uses a versioned, explainable JSON knowledge base. These records are domain definitions, not executable code.
 
 ## Files
 
@@ -15,7 +15,7 @@ Phase 2 establishes a versioned, explainable JSON knowledge base for the Smart H
 
 ## Evidence semantics
 
-A fact is not simply true or false. The future fact store must carry a status such as `confirmed`, `rejected`, `uncertain` or `missing`, plus a provenance/source note. Unknown or rejected facts must not satisfy rule conditions. A derived fact must record the rule that produced it.
+The fact store carries statuses such as `confirmed`, `rejected`, `uncertain` or `missing`, plus a provenance/source note. Unknown or rejected facts must not satisfy rule conditions. A derived fact records the rule that produced it.
 
 ## Calculation conventions
 
@@ -28,11 +28,11 @@ A fact is not simply true or false. The future fact store must carry a status su
 ## Rule semantics
 
 - Conditions within a rule are joined using AND (`all`).
-- The rule engine must support explicit operators and typed comparisons.
+- The rule engine supports explicit operators and typed comparisons.
 - Missing or uncertain evidence never matches.
 - `requires_conclusion` indicates a prerequisite conclusion.
 - Priority is metadata for deterministic conflict policy and trace display; it must not erase other valid conclusions or hide conflicting evidence.
-- Formula strings are declarative metadata. They must be parsed/implemented through a safe, allow-listed calculation layer, never evaluated as arbitrary Python.
+- Formula strings are declarative metadata. They are handled through an allow-listed calculation layer, never evaluated as arbitrary Python.
 
 ## Initial rule set
 
@@ -52,19 +52,17 @@ The advisor must not instruct users to open appliances, touch live wiring, bypas
 
 ## Validation requirements
 
-A knowledge-base validator must check:
-- JSON parses and matches the appropriate schema.
+The management validator in `knowledge_base/manager.py` checks:
+- JSON parses and matches the JSON Schema Draft 2020-12 structure.
 - IDs are unique within each collection.
 - Every rule category, fact, conclusion and recommendation reference exists.
-- Every recommendation's linked conclusions exist.
-- Operators are compatible with fact types.
+- Every recommendation's linked conclusions exist and match its supporting rule conclusion.
+- Operators are compatible with fact types and comparison values.
 - Numeric bounds and allowed enum values are respected.
-- Prerequisite conclusions exist and do not create an accidental dependency cycle.
-- Formula references use known facts and approved calculation names.
-- No recommendation is orphaned without a supporting conclusion/rule path.
+- Prerequisite conclusions do not create a dependency cycle.
+- Formula metadata matches the exact allow-list of implemented calculations.
+- Recommendations not referenced by any rule are reported as warnings.
 
-Cross-file semantic validation is required in addition to JSON Schema validation. The schema file is a structural contract; it is not itself proof that these checks have been executed.
+Cross-file semantic validation supplements JSON Schema validation. A schema file is a structural contract, not proof that a draft is valid. The validator does not establish that a domain rule is scientifically correct.
 
-## Scope and limitations
-
-The initial catalogue is a starter knowledge base, not an exhaustive engineering standard or a tariff database. It contains no hard-coded Pakistan tariff, appliance benchmarks or regulatory limits. Local tariffs and appliance-specific performance data must be entered or verified from authoritative current sources before use.
+See [Knowledge-Base Management](KNOWLEDGE_BASE_MANAGEMENT.md) for the safe draft-editing and export workflow.
