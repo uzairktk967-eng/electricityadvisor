@@ -49,6 +49,11 @@ Streamlit Community Cloud deployment does not itself execute the repository's un
 - [ ] Valid knowledge-base drafts export without modifying active repository files.
 - [ ] Session reset clears the consultation and its displayed result.
 - [ ] No user data is represented as durably saved.
+- [ ] Each completed assessment creates one immutable history snapshot with a unique ID and UTC timestamp.
+- [ ] Session history is capped at 25 items; deleting one or all entries updates the visible history.
+- [ ] JSON, CSV and printable HTML reports contain the expected facts, findings and disclosures.
+- [ ] HTML report values are escaped and CSV formula-like text is neutralized.
+- [ ] Exporting reports does not cause an unintended assessment rerun or duplicate history entry.
 
 ## Regression and safety review
 
