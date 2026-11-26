@@ -192,3 +192,11 @@
 - Added two focused regression cases matching the exact fan and refrigerator questions used during acceptance testing, including the singular refrigerator wording that omits an explicit “one”.
 - Updated extractor numeric-group handling to safely read the captured value from either supported quantity phrasing.
 - Source changes and regression tests were committed. Tests have not been executed, and the deployed Streamlit app has not yet been re-tested; runtime verification remains pending.
+
+
+## Phase 17 — Complete-question extraction hardening (implemented; verification pending)
+
+- Addressed a second gap exposed by the exact acceptance prompts: users wrote “for 30 days” rather than “30 days per month”. The extractor now interprets that duration as the monthly assessment period when the same question explicitly asks for monthly electricity consumption.
+- Added conservative fallback patterns for explicit appliance counts (e.g. “two electric fans”) and operating schedules (e.g. “run for 12 hours daily” and “operates for approximately 8 hours per day”) when the primary patterns do not match.
+- Added exact-prompt regression cases for both reported questions, asserting that quantity, rated power, daily runtime, monthly days and tariff are all extracted.
+- Changes are committed to the main repository branch. Automated tests have not been run and deployment behaviour is not yet verified.
