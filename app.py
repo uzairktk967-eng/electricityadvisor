@@ -167,14 +167,24 @@ with st.form("structured_fact_form"):
         input_min = float(minimum) if minimum is not None else None
         input_max = float(maximum) if maximum is not None else None
         default_value = input_min if input_min is not None else 0.0
-        structured_value = st.number_input(
-            f"Value{f' ({unit})' if unit else ''}",
-            min_value=input_min,
-            max_value=input_max,
-            value=default_value,
-            step=1.0 if kind == "integer" else 0.1,
-            format="%.2f",
-        )
+        if kind == "integer":
+            structured_value = st.number_input(
+                f"Value{f' ({unit})' if unit else ''}",
+                min_value=int(input_min) if input_min is not None else None,
+                max_value=int(input_max) if input_max is not None else None,
+                value=int(default_value),
+                step=1,
+                format="%d",
+            )
+        else:
+            structured_value = st.number_input(
+                f"Value{f' ({unit})' if unit else ''}",
+                min_value=input_min,
+                max_value=input_max,
+                value=default_value,
+                step=0.1,
+                format="%.2f",
+            )
     elif kind == "boolean":
         structured_value = st.selectbox("Value", [True, False], format_func=lambda value: "Yes" if value else "No")
     elif kind == "enum":
