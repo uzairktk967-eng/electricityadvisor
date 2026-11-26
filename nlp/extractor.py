@@ -51,12 +51,18 @@ NUMERIC_PATTERNS = {
         rf"(?:quantity|number\s+of\s+appliances|i\s+have|there\s+are|"
         rf"we\s+have)\s*(?:is|are|of|:|=)?\s*"
         rf"({NUMBER}|one|two|three|four|five|six|seven|eight|nine|ten)\b"
+        rf"|(?<!\w)({NUMBER}|one|two|three|four|five|six|seven|eight|nine|ten)"
+        rf"(?=\s+(?:(?:electric|ceiling|table|standing|pedestal|exhaust|"
+        rf"room|window|split|inverter)\s+)*(?:fans?|refrigerators?|fridges?|"
+        rf"air\s+conditioners?|acs?|washing\s+machines?|televisions?|tvs?|"
+        rf"heaters?|irons?|pumps?|lights?|bulbs?|appliances?)\b)"
     ),
     "usage.hours_per_day": re.compile(
         rf"(?<!standby\s)(?:used?\s+for|runs?\s*(?:for)?|run\s+for|"
         rf"operates?\s+for|operating\s+for|works?\s+for|"
         rf"usage(?:\s+time)?|operating\s+time)"
-        rf"\s*(?:(?:is|of|for)\s*)?{NUMBER}\s*{HOURS}\s*{PER_DAY}\b"
+        rf"\s*(?:(?:is|of|for)\s*)?(?:(?:approximately|approx\.?|around|about)\s*)?"
+        rf"{NUMBER}\s*{HOURS}\s*{PER_DAY}\b"
     ),
     "usage.standby_hours_per_day": re.compile(
         rf"standby\s+(?:time|hours?)(?:\s+is|\s+of|\s*:|\s*=)?\s*"
@@ -111,7 +117,10 @@ def extract_facts(text: str, phrase_map_path: str | Path | None = None) -> list[
 
     for fact_id, pattern in NUMERIC_PATTERNS.items():
         for match in pattern.finditer(normalized):
-            value = _number(match.group(1))
+            raw_value = next((group for group in match.groups() if group is not None), None)
+            if raw_value is None:
+                continue
+            value = _number(raw_value)
             status, note = _status_for_span(normalized, match.start(), match.end())
             candidates.append(FactCandidate(
                 fact_id, value, status, text, match.group(0),
