@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "categories": [
+    {
+      "id": "consumption_estimation",
+      "label": "Consumption estimation",
+      "description": "Estimate energy use from power, quantity and operating duration."
+    },
+    {
+      "id": "cost_estimation",
+      "label": "Cost estimation",
+      "description": "Estimate variable energy cost using a user-supplied tariff."
+    },
+    {
+      "id": "standby_consumption",
+      "label": "Standby consumption",
+      "description": "Assess energy used while equipment remains energized but is not performing its primary function."
+    },
+    {
+      "id": "usage_optimization",
+      "label": "Usage optimization",
+      "description": "Identify possible schedule or operating-duration adjustments."
+    },
+    {
+      "id": "appliance_efficiency",
+      "label": "Appliance efficiency",
+      "description": "Encourage comparison using labels, specifications or measured consumption."
+    },
+    {
+      "id": "electrical_safety",
+      "label": "Electrical safety",
+      "description": "Recognize warning symptoms and refer users to qualified professionals."
+    }
+  ]
+}
