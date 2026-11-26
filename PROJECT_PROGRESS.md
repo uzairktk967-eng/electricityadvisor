@@ -183,3 +183,12 @@
 - If required inputs are genuinely missing or not confirmed, the app now states exactly which values are needed rather than silently showing only extracted facts.
 - The answer is rendered immediately below the fact-review section so users do not need to search further down the page.
 - Latest app.py change was fetched back from GitHub and verified for the answer-generation and display paths. Automated tests and live Streamlit deployment interaction have not yet been run; runtime verification remains pending.
+
+
+## Phase 16 — Natural-language appliance quantity and runtime extraction (implemented; verification pending)
+
+- Fixed a real-world extraction gap reported during live user testing: quantity phrases such as “two electric fans” and “one refrigerator” are now recognized even when the user does not write “I have”.
+- Expanded daily-runtime extraction to accept approximate wording such as “approximately 8 hours per day” and “around 8 hours daily”. Approximate values remain marked uncertain for explicit user review; they are not silently treated as verified measurements.
+- Added two focused regression cases matching the exact fan and refrigerator questions used during acceptance testing.
+- Updated extractor numeric-group handling to safely read the captured value from either supported quantity phrasing.
+- Source changes and regression tests were committed. Tests have not been executed, and the deployed Streamlit app has not yet been re-tested; runtime verification remains pending.
