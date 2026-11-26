@@ -133,10 +133,11 @@ else:
                         clear_result()
                         st.rerun()
 
-st.subheader("3. Add or correct structured information")
+st.subheader("3. Add structured information")
 st.write(
-    "Use this section for details that were not extracted or need correction. "
-    "Values are recorded as user-confirmed inputs."
+    "Use this section for details that were not extracted. "
+    "Values are recorded as user-confirmed inputs. If a different value is added for a fact already confirmed, "
+    "the system will report conflicting evidence rather than silently replacing the earlier value."
 )
 fact_definitions = session.engine.fact_definitions
 fact_ids = list(fact_definitions)
