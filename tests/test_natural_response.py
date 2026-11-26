@@ -131,5 +131,17 @@ class NaturalResponseTests(unittest.TestCase):
         self.assertIn("I won't guess", answer)
 
 
+    def test_watts_and_kwh_are_distinguished(self):
+        answer = generate_natural_language_answer("What is the difference between watts and kWh?", None)
+        self.assertIn("Watt (W) measures power", answer)
+        self.assertIn("Kilowatt-hour", answer)
+
+    def test_unknown_question_with_empty_assessment_is_not_misreported_as_missing_inputs(self):
+        result = {"conclusions": {}, "evidence": {}, "recommendations": [], "conflicts": [], "safety_notice": None}
+        answer = generate_natural_language_answer("Who is the current president of France?", result)
+        self.assertIn("current knowledge base", answer)
+        self.assertIn("I won't guess", answer)
+
+
 if __name__ == "__main__":
     unittest.main()
