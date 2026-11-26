@@ -20,10 +20,12 @@ class SafeDictWriter(csv.DictWriter):
     """Neutralize spreadsheet formula prefixes in untrusted text cells."""
 
     def writerow(self, rowdict):
-        safe_row = {
-            key: ("'" + value if isinstance(value, str) and value.startswith(("=", "+", "-", "@", "\t", "\r")) else value)
-            for key, value in rowdict.items()
-        }
+        formula_prefixes = ("=", "+", "-", "@")
+        safe_row = {}
+        for key, value in rowdict.items():
+            if isinstance(value, str) and value.lstrip(" \\t\\r\\n")[:1] in formula_prefixes:
+                value = "'" + value
+            safe_row[key] = value
         super().writerow(safe_row)
 
 
