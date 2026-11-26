@@ -65,6 +65,22 @@ def _general_knowledge_answer(text: str) -> str | None:
             "enter. It does not calculate a complete utility bill; fixed charges, taxes, "
             "duties, tariff slabs and adjustments may be excluded."
         )
+    if _has(text, r"\bwhy\b.*\b(bill|electricity bill)\b.*\b(high|large|increased|more)\b",
+            r"\bwhy is my bill high\b"):
+        return (
+            "This advisor cannot identify every reason for a high electricity bill. It can "
+            "estimate the variable energy cost of the appliances and inputs you provide. "
+            "A complete bill may also include fixed charges, taxes, duties, tariff slabs, "
+            "adjustments, other appliances and billing-period differences. Compare the "
+            "bill's kWh, billing dates and tariff details to investigate the difference."
+        )
+    if _has(text, r"\b(difference|different)\b.*\b(watt|watts|w)\b.*\b(kwh|unit)\b",
+            r"\bwatts?\b.*\bvs\b.*\b(kwh|units?)\b"):
+        return (
+            "Watt (W) measures power: how quickly an appliance uses energy at a given "
+            "moment. Kilowatt-hour (kWh or one unit) measures energy over time. For "
+            "example, a 100 W appliance running for 10 hours uses 1 kWh."
+        )
     if _has(text, r"\b(actual|real)\b.*\b(consumption|usage)\b",
             r"\bwhy\b.*\b(estimate|actual|different|vary)\b",
             r"\b(cycl|compressor|thermostat|variable load)\b"):
@@ -120,12 +136,19 @@ def generate_natural_language_answer(
                 "variable energy cost, explain the calculation, discuss standby use and "
                 "verified efficiency information, and give conservative electrical-safety guidance."
             )
+        if _has(text, r"\b(appliance|electricity|energy|consumption|usage|units?|kwh|watt|power|tariff|cost|bill|standby|efficien|saving|save)\b"):
+            return (
+                "I can help with this electricity question, but there is no completed "
+                "assessment to refer to yet. For a monthly estimate, enter and confirm "
+                "rated power, quantity, hours per day and days per month. Add your tariff "
+                "per kWh if you also want an estimated variable cost."
+            )
         return (
-            "I can answer this using the electricity advisor's knowledge base, but I do not "
-            "have an assessment to refer to yet. Enter and confirm the appliance power, "
-            "quantity, hours per day and days per month, then run an assessment. If your "
-            "question is outside appliance energy use, cost, standby use, efficiency or "
-            "electrical safety, it is not covered by this knowledge base."
+            "I can't find a supported answer to that question in my current knowledge base. "
+            "It covers household appliance energy estimates, user-entered tariff-based "
+            "variable cost, required inputs and formulas, standby consumption, verified "
+            "efficiency-label comparisons, usage-schedule review and basic electrical-safety "
+            "referral. I won't guess beyond that scope."
         )
 
     safety_prefix = ""
