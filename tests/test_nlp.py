@@ -94,7 +94,7 @@ class ExtractionTests(unittest.TestCase):
         facts = extract_facts(
             "My refrigerator has a rated power of 200 W and operates "
             "for approximately 8 hours per day. Calculate usage for 30 days "
-            "at Rs. 55 per kWh. I have one refrigerator."
+            "at Rs. 55 per kWh."
         )
         pairs = {(item.fact_id, item.value) for item in facts}
         self.assertIn(("appliance.quantity", 1), pairs)
