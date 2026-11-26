@@ -180,10 +180,27 @@ def validate_documents(
                     errors.append(f"rules.json: '{rule_id}' expects a boolean comparison value for '{fact_id}'")
                 elif expected_type == "string" and not isinstance(value, str):
                     errors.append(f"rules.json: '{rule_id}' expects a string comparison value for '{fact_id}'")
-            if operator == "in" and isinstance(value, list) and fact["type"] == "enum":
-                invalid = [entry for entry in value if entry not in fact.get("allowed_values", [])]
-                if invalid:
-                    errors.append(f"rules.json: '{rule_id}' has invalid enum members for '{fact_id}': {invalid}")
+            if operator in {"gt", "gte", "lt", "lte"} and (
+                not isinstance(value, (int, float)) or isinstance(value, bool)
+            ):
+                errors.append(f"rules.json: '{rule_id}' requires a numeric threshold for '{fact_id}'")
+            if operator == "in" and isinstance(value, list):
+                if fact["type"] == "enum":
+                    invalid = [entry for entry in value if entry not in fact.get("allowed_values", [])]
+                    if invalid:
+                        errors.append(f"rules.json: '{rule_id}' has invalid enum members for '{fact_id}': {invalid}")
+                elif fact["type"] == "number" and any(
+                    not isinstance(entry, (int, float)) or isinstance(entry, bool) for entry in value
+                ):
+                    errors.append(f"rules.json: '{rule_id}' has non-numeric members for '{fact_id}'")
+                elif fact["type"] == "integer" and any(
+                    not isinstance(entry, int) or isinstance(entry, bool) for entry in value
+                ):
+                    errors.append(f"rules.json: '{rule_id}' has non-integer members for '{fact_id}'")
+                elif fact["type"] == "boolean" and any(not isinstance(entry, bool) for entry in value):
+                    errors.append(f"rules.json: '{rule_id}' has non-boolean members for '{fact_id}'")
+                elif fact["type"] == "string" and any(not isinstance(entry, str) for entry in value):
+                    errors.append(f"rules.json: '{rule_id}' has non-string members for '{fact_id}'")
 
         for recommendation_id in rule["recommendations"]:
             used_recommendations.add(recommendation_id)
