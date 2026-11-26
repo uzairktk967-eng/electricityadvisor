@@ -188,7 +188,7 @@
 ## Phase 16 — Natural-language appliance quantity and runtime extraction (implemented; verification pending)
 
 - Fixed a real-world extraction gap reported during live user testing: quantity phrases such as “two electric fans” are recognized even when the user does not write “I have”. A singular named appliance in a single-appliance description is represented as one unit, with an explicit confirmation note.
-- Expanded daily-runtime extraction to accept approximate wording such as “approximately 8 hours per day” and “around 8 hours daily”. Approximate values remain marked uncertain for explicit user review; they are not silently treated as verified measurements.
+- Expanded daily-runtime extraction to accept approximate wording such as “approximately 8 hours per day” and “around 8 hours daily”. Approximate values remain marked uncertain for explicit user review; they are not silently treated as verified measurements. Per-unit tariff extraction also accepts direct wording such as “at Rs. 55 per kWh”.
 - Added two focused regression cases matching the exact fan and refrigerator questions used during acceptance testing, including the singular refrigerator wording that omits an explicit “one”.
 - Updated extractor numeric-group handling to safely read the captured value from either supported quantity phrasing.
 - Source changes and regression tests were committed. Tests have not been executed, and the deployed Streamlit app has not yet been re-tested; runtime verification remains pending.
