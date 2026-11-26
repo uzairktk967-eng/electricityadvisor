@@ -49,6 +49,20 @@ class ConsultationHistoryTests(unittest.TestCase):
         self.assertIn("conclusion", types)
         self.assertIn("rule_explanation", types)
 
+
+    def test_csv_export_neutralizes_spreadsheet_formulas(self):
+        malicious = dict(self.entry)
+        malicious["facts"] = [{
+            "fact_id": "test.fact",
+            "label": '=HYPERLINK("https://example.invalid")',
+            "value": "normal",
+            "status": "confirmed",
+            "source": "test",
+            "note": "",
+        }]
+        rows = list(csv.DictReader(StringIO(export_csv(malicious))))
+        self.assertEqual(rows[0]["label"], '\'=HYPERLINK("https://example.invalid")')
+
     def test_html_report_escapes_untrusted_fact_values(self):
         # Exercise escaping independently of the catalogue's normal type constraints.
         malicious = dict(self.entry)
