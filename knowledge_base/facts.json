@@ -104,6 +104,14 @@
       "unit": null,
       "description": "Whether appliance use can be shifted without affecting essential needs or safety.",
       "evidence": "user_input"
+    },
+    {
+      "id": "appliance.standby_power_w",
+      "type": "number",
+      "unit": "W",
+      "description": "Power specifically measured or documented while the appliance is in standby mode.",
+      "evidence": "measured",
+      "minimum": 0
     }
   ]
 }
