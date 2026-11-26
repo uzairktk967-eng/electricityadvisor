@@ -8,6 +8,7 @@ import zipfile
 import streamlit as st
 
 from consultation import ConsultationSession
+from consultation.multi_appliance import assess_multiple_appliances
 from consultation.history import build_history_entry, export_csv, export_html, export_json
 from knowledge_base import KNOWLEDGE_FILES, load_documents, validate_documents
 
@@ -33,6 +34,12 @@ if "last_result" not in st.session_state:
     st.session_state.last_result = None
 if "consultation_history" not in st.session_state:
     st.session_state.consultation_history = []
+if "multi_appliance_rows" not in st.session_state:
+    st.session_state.multi_appliance_rows = [{"id": 1}]
+if "next_multi_appliance_id" not in st.session_state:
+    st.session_state.next_multi_appliance_id = 2
+if "last_multi_result" not in st.session_state:
+    st.session_state.last_multi_result = None
 
 session: ConsultationSession = st.session_state.consultation
 
@@ -63,6 +70,9 @@ with st.sidebar:
     if st.button("Start a new consultation", use_container_width=True):
         st.session_state.consultation = new_consultation()
         st.session_state.last_result = None
+        st.session_state.last_multi_result = None
+        st.session_state.multi_appliance_rows = [{"id": 1}]
+        st.session_state.next_multi_appliance_id = 2
         st.rerun()
     st.divider()
     st.markdown("**How it works**")
@@ -79,9 +89,8 @@ with st.sidebar:
 
 st.subheader("1. Describe your appliance or concern")
 st.caption(
-    "Natural-language extraction currently handles one appliance profile at a time. "
-    "For several different appliances, assess each appliance separately; do not combine "
-    "different wattages and runtimes into one profile."
+    "You can describe one appliance here. For a household with several different appliances, "
+    "use the separate multi-appliance assessment below so each appliance keeps its own inputs."
 )
 with st.form("description_form", clear_on_submit=True):
     description = st.text_area(
@@ -210,7 +219,140 @@ if submitted_fact:
         except (TypeError, ValueError) as exc:
             st.error(f"Input was not accepted: {exc}")
 
-st.subheader("4. Check what information is missing")
+st.subheader("4. Assess several household appliances")
+st.write(
+    "Enter each appliance separately. The system calculates each appliance first, then adds "
+    "the results to produce a household monthly total. This prevents wattage and runtime values "
+    "from being mixed between appliances."
+)
+
+if st.button("Add another appliance", key="add_multi_appliance", use_container_width=True):
+    st.session_state.multi_appliance_rows.append(
+        {"id": st.session_state.next_multi_appliance_id}
+    )
+    st.session_state.next_multi_appliance_id += 1
+    st.rerun()
+
+with st.form("multi_appliance_assessment_form"):
+    multi_values = []
+    for row_number, row in enumerate(st.session_state.multi_appliance_rows, start=1):
+        st.markdown(f"**Appliance {row_number}**")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            appliance_name = st.text_input(
+                "Appliance name", key=f"multi_name_{row['id']}",
+                placeholder="e.g. Ceiling fans"
+            )
+            rated_power = st.number_input(
+                "Rated power (W)", min_value=0.0, value=100.0, step=1.0,
+                key=f"multi_power_{row['id']}"
+            )
+        with col2:
+            quantity = st.number_input(
+                "Quantity", min_value=1, value=1, step=1, format="%d",
+                key=f"multi_quantity_{row['id']}"
+            )
+            hours_per_day = st.number_input(
+                "Hours per day", min_value=0.0, max_value=24.0, value=1.0,
+                step=0.5, key=f"multi_hours_{row['id']}"
+            )
+        with col3:
+            days_per_month = st.number_input(
+                "Days per month", min_value=0.0, max_value=31.0, value=30.0,
+                step=1.0, key=f"multi_days_{row['id']}"
+            )
+        multi_values.append({
+            "name": appliance_name,
+            "rated_power_w": rated_power,
+            "quantity": int(quantity),
+            "hours_per_day": hours_per_day,
+            "days_per_month": days_per_month,
+        })
+
+    include_tariff = st.checkbox("Calculate estimated variable electricity cost", value=True)
+    tariff_value = st.number_input(
+        "Tariff per kWh (Rs. for PKR tariff)", min_value=0.0, value=55.0,
+        step=0.5, disabled=not include_tariff
+    )
+    electrical_symptom = st.checkbox(
+        "Any appliance has sparks, burning smell, electric shock, hot wiring/outlet, "
+        "or repeated breaker trips"
+    )
+    submitted_multi = st.form_submit_button(
+        "Calculate household consumption", type="primary", use_container_width=True
+    )
+
+if submitted_multi:
+    try:
+        multi_result = assess_multiple_appliances(
+            KNOWLEDGE_BASE, multi_values,
+            tariff_per_kwh=tariff_value if include_tariff else None,
+            electrical_symptom=electrical_symptom,
+        )
+        st.session_state.last_multi_result = multi_result
+        clear_result()
+        history_entry = build_history_entry(session, multi_result)
+        for appliance in multi_result["appliances"]:
+            for fact_id, value, label, unit in [
+                ("appliance.name", appliance["name"], "Appliance name", ""),
+                ("appliance.rated_power_w", appliance["rated_power_w"], "Rated power", "W"),
+                ("appliance.quantity", appliance["quantity"], "Quantity", "count"),
+                ("usage.hours_per_day", appliance["hours_per_day"], "Daily operating time", "hours/day"),
+                ("usage.days_per_month", appliance["days_per_month"], "Monthly usage days", "days/month"),
+            ]:
+                history_entry["facts"].append({
+                    "fact_id": fact_id, "label": f"{appliance['name']} — {label}",
+                    "value": value, "unit": unit, "status": "confirmed",
+                    "source": "multi_appliance_structured_input", "note": "",
+                })
+        if include_tariff:
+            history_entry["facts"].append({
+                "fact_id": "tariff.price_per_kwh", "label": "Tariff per kWh",
+                "value": tariff_value, "unit": "Rs./kWh", "status": "confirmed",
+                "source": "multi_appliance_structured_input", "note": "",
+            })
+        st.session_state.consultation_history.insert(0, history_entry)
+        st.session_state.consultation_history = st.session_state.consultation_history[:MAX_HISTORY_ITEMS]
+        st.success("Household assessment completed. Review the appliance breakdown below.")
+    except (TypeError, ValueError) as exc:
+        st.error(f"Could not calculate household consumption: {exc}")
+
+multi_result = st.session_state.last_multi_result
+if multi_result is not None:
+    st.subheader("Household assessment results")
+    if multi_result.get("safety_notice"):
+        st.error(multi_result["safety_notice"])
+    result_columns = st.columns(2)
+    result_columns[0].metric(
+        "Total monthly consumption", f"{multi_result['total_monthly_kwh']:,.2f} kWh"
+    )
+    if multi_result["total_monthly_variable_cost"] is not None:
+        result_columns[1].metric(
+            "Estimated variable cost",
+            f"Rs. {multi_result['total_monthly_variable_cost']:,.2f}"
+        )
+    st.dataframe(
+        [{
+            "Appliance": item["name"],
+            "Quantity": item["quantity"],
+            "Rated power (W)": item["rated_power_w"],
+            "Hours/day": item["hours_per_day"],
+            "Days/month": item["days_per_month"],
+            "Monthly consumption (kWh)": round(item["monthly_kwh"], 3),
+            "Variable cost (Rs.)": (
+                round(item["monthly_variable_cost"], 2)
+                if item["monthly_variable_cost"] is not None else None
+            ),
+        } for item in multi_result["appliances"]],
+        use_container_width=True,
+        hide_index=True,
+    )
+    st.info(
+        f"Highest electricity consumer: **{multi_result['highest_consumption_appliance']}**."
+    )
+    st.caption(multi_result["disclosure"])
+
+st.subheader("5. Check what information is missing")
 target_options = [
     "energy.monthly_kwh_estimate_available",
     "cost.monthly_variable_estimate_available",
@@ -234,7 +376,7 @@ if st.button("Find missing information"):
             "Review the evidence and any blockers below, then run the assessment."
         )
 
-st.subheader("5. Run the assessment")
+st.subheader("6. Run the single-appliance assessment")
 if st.button("Run electricity assessment", type="primary", use_container_width=True):
     try:
         assessment = session.run()
@@ -323,7 +465,7 @@ if result is not None:
     )
 
 st.divider()
-st.subheader("6. Consultation history and reports")
+st.subheader("7. Consultation history and reports")
 history_items = st.session_state.consultation_history
 st.caption(
     f"{len(history_items)} assessment(s) in this browser session. "
