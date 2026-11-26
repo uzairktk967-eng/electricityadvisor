@@ -21,17 +21,16 @@ Project identity should be stored centrally in a configuration module during imp
 6. Keep the core application free of paid APIs and external AI dependencies.
 7. Validate knowledge-base changes before accepting them.
 8. Use lightweight storage and document persistence limits clearly.
+9. NLP proposes candidate facts only; it must not infer conclusions or silently confirm ambiguous evidence.
 
 ## 3. Proposed logical components
-
-The following is a target design, not a claim that these modules already exist.
 
 | Component | Responsibility |
 |---|---|
 | `config/` | Central project identity and application settings |
 | `knowledge_base/` | JSON facts, rules, conclusions, categories and recommendations |
 | `expert_system/` | Fact model, rule matcher, forward chaining, backward chaining and conflict resolution |
-| `nlp/` | Text normalization, tokenization, synonym/phrase mapping, negation and uncertainty handling |
+| `nlp/` | Text normalization, tokenization, controlled phrase mapping, negation and uncertainty handling |
 | `consultation/` | Dialogue state, evidence confirmation, missing-information questions and response assembly |
 | `explainability/` | Rule evaluation log, inference trace and human-readable explanations |
 | `validation/` | Knowledge-base schema, reference, duplicate and consistency checks |
@@ -39,13 +38,13 @@ The following is a target design, not a claim that these modules already exist.
 | `storage/` | Session/history persistence adapter, with a documented lightweight backend |
 | `ui/` | Streamlit pages and reusable presentation components |
 | `tests/` | Unit, integration, scenario and regression tests |
-| `docs/` | Architecture, user, developer, testing and academic documentation |
+| `docs/` | Architecture, user, developer, testing, NLP and academic documentation |
 
 ## 4. Intended consultation data flow
 
 1. The user describes an electricity-use concern and provides appliance and usage details.
 2. The NLP layer extracts candidate facts with confidence/ambiguity metadata; it does not decide conclusions.
-3. The consultation layer asks focused questions for missing or ambiguous evidence.
+3. The consultation layer asks focused questions for missing or ambiguous evidence and requests confirmation of extracted candidates.
 4. Confirmed and rejected evidence is stored as explicit facts with provenance.
 5. The inference engine matches validated rules and derives conclusions using forward chaining; backward chaining can identify evidence needed for a requested hypothesis.
 6. Conflict handling applies documented priorities and reports unresolved conflicts rather than hiding them.
@@ -61,8 +60,7 @@ The following is a target design, not a claim that these modules already exist.
 - **Evidence status:** At minimum confirmed, rejected, uncertain and missing.
 - **Reasoning trace:** Ordered record of evaluated rules, matched conditions, derived facts and conflicts.
 - **Recommendation:** A domain action linked to a rule and supported conclusion.
-
-Exact JSON schemas and the first domain rule set belong to Phase 2, not Phase 1.
+- **Fact candidate:** A proposed fact extracted from natural language, including source text, matched phrase, status and confidence indicator; it requires user review.
 
 ## 6. Inference design
 
@@ -77,7 +75,7 @@ Exact JSON schemas and the first domain rule set belong to Phase 2, not Phase 1.
 
 - Python for application and reasoning logic.
 - Streamlit for the user interface.
-- JSON for the initial knowledge base.
+- JSON for the initial knowledge base and controlled NLP phrase catalogue.
 - Python standard library and free/open-source packages where needed.
 - SQLite only if later requirements justify durable structured history.
 - Streamlit Community Cloud as the intended free deployment target, subject to deployment verification.
@@ -88,12 +86,14 @@ No paid API or hosted service is required for core reasoning.
 
 Electricity estimates depend on appliance wattage, operating time, quantity and applicable tariff assumptions. The system must distinguish user-provided measurements from estimates and disclose assumptions. It should avoid presenting estimated savings as guaranteed bill reductions. Electrical installation, wiring faults and hazardous repair advice are outside the scope of ordinary energy-saving recommendations; users should be directed to a qualified electrician for such issues.
 
-## 9. Phase boundaries
+The NLP package uses a limited deterministic vocabulary and explicit patterns. It may miss paraphrases or ambiguous wording. It must return candidates for user confirmation and must not present its confidence indicator as a calibrated probability.
 
-- **Phase 1:** Audit and architecture only — complete.
-- **Phase 2:** Engineer and validate the JSON knowledge base.
-- **Phase 3:** Implement the independent symbolic inference engine — committed; runtime test execution pending.
-- **Phase 4:** Implement constrained, explainable lightweight NLP after Phase 3 tests pass.
-- **Phase 5 onward:** Build consultation, UI, management, testing, reporting and deployment capabilities in sequence.
+## 9. Phase boundaries and verification
 
-This document describes the intended design. A component is implemented only when its source code and verification evidence exist in the repository.
+- **Phase 1:** Audit and architecture — complete.
+- **Phase 2:** Engineer and structurally validate the JSON knowledge base — complete.
+- **Phase 3:** Implement the independent symbolic inference engine — implemented; runtime verification deferred until Streamlit deployment at the developer's request.
+- **Phase 4:** Implement constrained, explainable lightweight NLP — implemented; runtime verification deferred until Streamlit deployment.
+- **Phase 5 onward:** Build consultation, UI, management, explainability, validation, reporting and deployment capabilities in sequence.
+
+A component is implemented only when its source code and documentation exist. Test execution status must be reported separately; authored tests must never be described as passing until they have actually run.
