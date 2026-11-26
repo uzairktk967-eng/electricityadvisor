@@ -174,3 +174,12 @@
 - If the assessment cannot run, the UI displays an explanatory message instead of silently leaving the user without a response.
 - The existing manual assessment button remains available for structured inputs and repeat assessments.
 - Updated app.py was fetched back from GitHub and checked for the automatic review-to-assessment flow. Automated tests and deployed Streamlit interaction have not yet been run; live verification remains pending.
+
+
+## Phase 15 — Always show an answer after fact review (implemented; runtime verification pending)
+
+- The completed fact-review workflow now constructs a clear answer containing monthly kWh/units and, when a confirmed tariff exists, estimated variable cost.
+- If the inference engine does not emit an energy conclusion despite complete confirmed inputs, the app uses the same transparent dimensional formula with those confirmed values as a guarded arithmetic fallback.
+- If required inputs are genuinely missing or not confirmed, the app now states exactly which values are needed rather than silently showing only extracted facts.
+- The answer is rendered immediately below the fact-review section so users do not need to search further down the page.
+- Latest app.py change was fetched back from GitHub and verified for the answer-generation and display paths. Automated tests and live Streamlit deployment interaction have not yet been run; runtime verification remains pending.
