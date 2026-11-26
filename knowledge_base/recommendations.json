@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "recommendations": [
+    {
+      "id": "rec.verify_power_input",
+      "category": "consumption_estimation",
+      "text": "Check the appliance nameplate or manufacturer documentation for input power. If practical, use a suitable energy meter to measure actual consumption.",
+      "linked_conclusions": [
+        "energy.monthly_kwh_estimate_available"
+      ],
+      "safety_note": "Do not open equipment or contact live electrical parts to obtain a reading."
+    },
+    {
+      "id": "rec.review_runtime",
+      "category": "usage_optimization",
+      "text": "Review whether operating hours can be reduced or scheduled more efficiently without affecting essential use, food safety, comfort or manufacturer instructions.",
+      "linked_conclusions": [
+        "usage.schedule_review_candidate"
+      ],
+      "safety_note": "Do not switch off essential medical, safety, refrigeration or other critical equipment."
+    },
+    {
+      "id": "rec.check_standby_controls",
+      "category": "standby_consumption",
+      "text": "Where the manufacturer permits it and the device is not performing an essential function, consider its built-in standby or power-management settings.",
+      "linked_conclusions": [
+        "standby.energy_estimate_available"
+      ],
+      "safety_note": "Avoid cutting power to devices that require continuous operation, updates or safe shutdown."
+    },
+    {
+      "id": "rec.compare_energy_labels",
+      "category": "appliance_efficiency",
+      "text": "Compare verified energy labels or standardized manufacturer consumption figures for appliances providing the same service.",
+      "linked_conclusions": [
+        "efficiency.specification_comparison_advised"
+      ],
+      "safety_note": "Compare like-for-like capacity, usage assumptions and label test conditions."
+    },
+    {
+      "id": "rec.use_user_tariff",
+      "category": "cost_estimation",
+      "text": "Use the applicable marginal per-kWh rate from the current electricity tariff or bill and keep fixed charges and taxes separate.",
+      "linked_conclusions": [
+        "cost.monthly_variable_estimate_available"
+      ],
+      "safety_note": "A simplified estimate is not a guaranteed final bill amount."
+    },
+    {
+      "id": "rec.contact_electrician",
+      "category": "electrical_safety",
+      "text": "Stop using the affected appliance or outlet if it is safe to do so, keep others away, and contact a qualified electrician for inspection.",
+      "linked_conclusions": [
+        "safety.professional_inspection_required"
+      ],
+      "safety_note": "Do not touch exposed wires, attempt repairs, or repeatedly reset a tripping breaker."
+    }
+  ]
+}
