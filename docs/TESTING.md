@@ -9,12 +9,12 @@ The current authored suite contains:
 | Test module | Coverage | Tests |
 |---|---|---:|
 | `tests/test_inference_engine.py` | Forward/backward chaining, calculations, evidence states, conflicts and type validation | 9 |
-| `tests/test_nlp.py` | Normalization, extraction, numeric parsing, uncertainty and negation | 9 |
+| `tests/test_nlp.py` | Normalization, extraction, numeric parsing, uncertainty, negation, paraphrases and punctuation | 13 |
 | `tests/test_consultation.py` | Candidate review, structured facts, missing questions and response assembly | 8 |
 | `tests/test_knowledge_base.py` | JSON Schema and cross-file validation | 6 |
-| `tests/test_end_to_end.py` | Complete consultation scenarios and explanation contract | 10 |
-| `tests/test_history.py` | Session snapshots, provenance, JSON/CSV/HTML exports and output safety | 8 |
-| **Total** | | **51** |
+| `tests/test_end_to_end.py` | Complete consultation scenarios and explanation contract | 11 |
+| `tests/test_history.py` | Session snapshots, provenance, JSON/CSV/HTML exports and output safety | 9 |
+| **Total** | | **56** |
 
 ## Run locally or after deployment
 
