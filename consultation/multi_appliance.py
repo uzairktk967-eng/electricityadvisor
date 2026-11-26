@@ -8,6 +8,7 @@ each appliance has a rule-supported energy result.
 from __future__ import annotations
 
 from pathlib import Path
+import math
 from typing import Any, Iterable
 
 from .session import ConsultationSession
@@ -39,14 +40,23 @@ def assess_multiple_appliances(
         hours = item.get("hours_per_day")
         days = item.get("days_per_month")
 
-        if isinstance(power, bool) or not isinstance(power, (int, float)) or power < 0:
-            raise ValueError(f"{name}: rated power must be a non-negative number.")
+        if (
+            isinstance(power, bool) or not isinstance(power, (int, float))
+            or not math.isfinite(power) or power < 0
+        ):
+            raise ValueError(f"{name}: rated power must be a finite, non-negative number.")
         if isinstance(quantity, bool) or not isinstance(quantity, int) or quantity < 1:
             raise ValueError(f"{name}: quantity must be a whole number of at least 1.")
-        if isinstance(hours, bool) or not isinstance(hours, (int, float)) or not 0 <= hours <= 24:
-            raise ValueError(f"{name}: daily operating hours must be between 0 and 24.")
-        if isinstance(days, bool) or not isinstance(days, (int, float)) or not 0 <= days <= 31:
-            raise ValueError(f"{name}: monthly usage days must be between 0 and 31.")
+        if (
+            isinstance(hours, bool) or not isinstance(hours, (int, float))
+            or not math.isfinite(hours) or not 0 <= hours <= 24
+        ):
+            raise ValueError(f"{name}: daily operating hours must be a finite value between 0 and 24.")
+        if (
+            isinstance(days, bool) or not isinstance(days, (int, float))
+            or not math.isfinite(days) or not 0 <= days <= 31
+        ):
+            raise ValueError(f"{name}: monthly usage days must be a finite value between 0 and 31.")
 
         session = ConsultationSession(knowledge_base_dir)
         session.add_fact("appliance.name", name)
@@ -55,8 +65,12 @@ def assess_multiple_appliances(
         session.add_fact("usage.hours_per_day", float(hours))
         session.add_fact("usage.days_per_month", float(days))
         if tariff_per_kwh is not None:
-            if isinstance(tariff_per_kwh, bool) or not isinstance(tariff_per_kwh, (int, float)) or tariff_per_kwh < 0:
-                raise ValueError("Tariff must be a non-negative amount per kWh.")
+            if (
+                isinstance(tariff_per_kwh, bool)
+                or not isinstance(tariff_per_kwh, (int, float))
+                or not math.isfinite(tariff_per_kwh) or tariff_per_kwh < 0
+            ):
+                raise ValueError("Tariff must be a finite, non-negative amount per kWh.")
             session.add_fact("tariff.price_per_kwh", float(tariff_per_kwh))
         if electrical_symptom:
             session.add_fact("supply.has_electrical_symptom", True)
