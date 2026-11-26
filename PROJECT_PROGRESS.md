@@ -20,8 +20,8 @@
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Repository audit and architecture | **Complete** |
-| 2 | Knowledge-base engineering | Not started |
-| 3 | Core inference engine (forward/backward chaining, matching, conflict handling) | Not started |
+| 2 | Knowledge-base engineering | **Complete** |
+| 3 | Core inference engine (forward/backward chaining, matching, conflict handling) | Next |
 | 4 | Lightweight natural-language processing | Not started |
 | 5 | Consultation and response engine | Not started |
 | 6 | Streamlit professional UI | Not started |
@@ -40,8 +40,23 @@
 
 ## Next phase
 
-**Phase 2 — Knowledge Base Engineering.** Define the domain facts, rule schema, conclusion schema, recommendation records, categories, validation constraints and evidence boundaries in structured JSON. Do not begin Phase 2 until the user explicitly says **Next**.
+**Phase 3 — Core Inference Engine.** Implement typed fact storage, rule matching, forward chaining, backward chaining, deterministic conflict handling and an auditable inference trace. Begin only when the user explicitly says **Next**.
+
+## Phase 2 deliverables
+
+- Added versioned JSON catalogues for 13 facts, 6 categories, 6 conclusions, 6 recommendations and 6 IF–THEN rules.
+- Added a Draft 2020-12 JSON Schema describing the knowledge-base file structures.
+- Added `docs/KNOWLEDGE_BASE.md` documenting evidence semantics, calculation conventions, rule semantics, safety boundaries and validation requirements.
+- Added a standby-specific power fact so standby estimates cannot use ordinary rated operating power by implication.
+- Preserved the original README and architecture document.
+
+## Phase 2 verification
+
+- All six JSON files were fetched back from GitHub and parsed successfully.
+- A cross-file semantic check found no unknown fact, category, conclusion or recommendation references.
+- Duplicate-ID checks passed for all catalogues and rules.
+- This was a structural and reference check, not execution of a formal JSON Schema validator or application tests.
 
 ## Verification notes
 
-Phase 1 is an audit and design phase; no application runtime or automated tests exist yet. No test pass, working inference engine, or deployment is claimed.
+Phases 1 and 2 are documentation/knowledge engineering deliverables. No application runtime, inference engine, automated application test suite or deployment exists yet. No runtime behavior or test pass is claimed.
