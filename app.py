@@ -109,6 +109,7 @@ if submitted_description:
     else:
         extracted = session.submit_text(description.strip())
         clear_result()
+        st.session_state.last_multi_result = None
         if extracted:
             st.success(f"Found {len(extracted)} candidate fact(s). Review them below.")
         else:
@@ -215,6 +216,7 @@ if submitted_fact:
         try:
             session.add_fact(selected_fact, structured_value)
             clear_result()
+            st.session_state.last_multi_result = None
             st.success(f"Added: {definition.get('description', selected_fact)}")
         except (TypeError, ValueError) as exc:
             st.error(f"Input was not accepted: {exc}")
@@ -291,7 +293,7 @@ if submitted_multi:
         )
         st.session_state.last_multi_result = multi_result
         clear_result()
-        history_entry = build_history_entry(session, multi_result)
+        history_entry = build_history_entry(new_consultation(), multi_result)
         for appliance in multi_result["appliances"]:
             for fact_id, value, label, unit in [
                 ("appliance.name", appliance["name"], "Appliance name", ""),
@@ -380,6 +382,7 @@ st.subheader("6. Run the single-appliance assessment")
 if st.button("Run electricity assessment", type="primary", use_container_width=True):
     try:
         assessment = session.run()
+        st.session_state.last_multi_result = None
         st.session_state.last_result = assessment
         history_entry = build_history_entry(session, assessment)
         st.session_state.consultation_history.insert(0, history_entry)
