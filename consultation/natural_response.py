@@ -170,7 +170,15 @@ def generate_natural_language_answer(
     appliances = result.get("appliances")
     is_multi = isinstance(appliances, list)
 
-    if _has(text, r"\b(what (?:are|were) )?(my )?(input|inputs|details|assumptions)\b",
+    if not _has(text, r"\b(consumption|electricity|energy|units?|kwh|watt|power|tariff|cost|bill|standby|efficien|saving|save|compare|formula|input|details|estimate|calculate|usage|appliance)\b"):
+        return (
+            "I can't find a supported answer to that question in my current knowledge base. "
+            "It covers appliance energy estimates, tariff-based variable cost, calculation "
+            "inputs and formulas, standby consumption, verified efficiency comparisons, "
+            "usage-schedule review and basic electrical-safety referral. I won't guess."
+        )
+
+    if _has(text, r"\b(what (?:are|were)|show|list|repeat)\b.*\b(inputs|details|assumptions)\b",
             r"\bwhat information did i give\b", r"\bshow.*\b(power|hours|quantity|tariff)\b"):
         if is_multi:
             rows = [
