@@ -271,9 +271,9 @@ with st.form("multi_appliance_assessment_form"):
             "days_per_month": days_per_month,
         })
 
-    include_tariff = st.checkbox("Calculate estimated variable electricity cost", value=True)
+    include_tariff = st.checkbox("Calculate estimated variable electricity cost", value=False)
     tariff_value = st.number_input(
-        "Tariff per kWh (Rs. for PKR tariff)", min_value=0.0, value=55.0,
+        "Tariff per kWh (Rs. for PKR tariff)", min_value=0.0, value=0.0,
         step=0.5, disabled=not include_tariff
     )
     electrical_symptom = st.checkbox(
