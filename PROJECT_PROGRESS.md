@@ -22,7 +22,8 @@
 | 9 | History, reports and exports | **Implemented; runtime verification deferred until deployment** |
 | 10 | Final audit, documentation and deployment readiness | **Source audit complete; deployment/runtime verification pending** |
 | 11 | Post-deployment bug fixing: NLP robustness and input validation | **Implemented; automated verification pending** |
-| 12 | Multi-appliance household assessment | **Implemented in source; automated and live verification pending** |
+| 12 | Multi-appliance household assessment | **Implemented in source; prior CI run passed; latest revision verification pending** |
+| 13 | Natural-language conversational answers | **Implemented in source; latest CI and live verification pending** |
 
 ## Phase 1 — Repository audit and architecture
 
@@ -138,6 +139,17 @@
 - Added eight focused tests in `tests/test_multi_appliance.py`, bringing the authored suite to 64 tests. Tests have not yet been executed; the GitHub Actions workflow was added to run the suite on pushes and pull requests.
 - Acceptance example: 3 × 80 W fans at 10 h/day, 5 × 20 W bulbs at 6 h/day, and 1 × 1,000 W heater at 3 h/day, each for 30 days, should total 180 kWh/month; at Rs. 55/kWh, the estimated variable cost is Rs. 9,900, and the heater is the largest consumer.
 
+## Phase 13 — Natural-language conversational answers (implemented; verification pending)
+
+- Added `consultation/natural_response.py`, a deterministic, evidence-grounded response helper that converts supported assessment results into conversational English.
+- Added a Streamlit question field labelled “Ask a question in your own words” so users can ask about consumption, cost, the highest-consuming appliance, and practical usage review.
+- For multi-appliance results, the helper can explain the household total, itemized appliance consumption, variable cost and highest-consuming appliance.
+- For single-appliance results, it explains estimated monthly kWh, the calculation inputs and limitations, and requests the missing tariff before estimating cost.
+- If no assessment exists, it asks the user to enter and confirm required inputs first. If evidence is insufficient or the question is outside the supported scope, it says so rather than inventing an answer.
+- Safety-related questions receive a conservative qualified-electrician referral. The helper does not diagnose electrical faults or give repair instructions.
+- The implementation uses deterministic local templates and no external AI/API. It is a limited-domain conversational helper, not an unrestricted chatbot. It currently generates English responses; multilingual responses are not implemented.
+- Added six tests in `tests/test_natural_response.py`. The authored suite now contains 70 tests. A previous 64-test revision passed in GitHub Actions; the latest revision with natural-language response tests still needs its own completed successful workflow run and live Streamlit check.
+
 ## Verification status
 
 - Phase 7 management code, UI and documentation were fetched back from GitHub during its implementation.
@@ -149,4 +161,6 @@
 
 **Phase 11 — Post-deployment bug fixing.** Single-appliance NLP coverage, punctuation matching, quantity typing and CI test automation have been improved. Automated test execution and deployed runtime verification remain outstanding.
 
-**Phase 12 — Multi-appliance household assessment.** The source implementation now calculates each appliance independently and aggregates household totals, variable cost and highest consumption. Automated test execution and live Streamlit acceptance remain outstanding.
+**Phase 12 — Multi-appliance household assessment.** The source implementation calculates each appliance independently and aggregates household totals, variable cost and highest consumption. A previous 64-test revision passed in GitHub Actions; latest source revision and live Streamlit acceptance remain outstanding.
+
+**Phase 13 — Natural-language conversational answers.** Users can ask common questions in their own words and receive evidence-grounded conversational English answers. The current helper is deterministic and limited to supported question types; current-revision CI and live verification remain outstanding.
