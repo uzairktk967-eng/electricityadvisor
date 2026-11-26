@@ -33,7 +33,7 @@ Project identity is currently defined in the app/report presentation layer; cent
 | `knowledge_base/` | JSON facts, rules, conclusions, categories, schema and safe draft validation |
 | `expert_system/` | Fact model, rule matcher, forward chaining, backward chaining and conflict handling |
 | `nlp/` | Text normalization, tokenization, controlled phrase mapping, negation and uncertainty handling |
-| `consultation/` | Dialogue state, evidence confirmation, missing-information questions, response assembly, history snapshots and report exports |
+| `consultation/` | Dialogue state, evidence confirmation, missing-information questions, response assembly, independent multi-appliance assessments, history snapshots and report exports |
 | `app.py` | Streamlit consultation, knowledge-base draft-management, history and report UI |
 | `tests/` | Unit, integration, scenario and regression tests |
 | `docs/` | Architecture, knowledge-base, developer, UI, testing and user documentation |
@@ -44,7 +44,8 @@ Project identity is currently defined in the app/report presentation layer; cent
 2. NLP extracts candidate facts with confidence/ambiguity metadata; it does not decide conclusions.
 3. The UI displays candidates and requires explicit confirmation or rejection.
 4. The consultation layer records reviewed evidence with provenance. Structured facts are validated against the fact catalogue.
-5. Backward chaining identifies evidence needed for a requested target conclusion.
+5. For household assessments, each appliance is evaluated in its own consultation and only its independently derived energy estimate is aggregated into household totals.
+6. Backward chaining identifies evidence needed for a requested target conclusion.
 6. The inference engine matches validated rules and derives conclusions using forward chaining.
 7. Conflict handling reports unresolved contradictions rather than silently choosing one value.
 8. The consultation service returns conclusions, fired rules, explanations, limitations, rule-linked recommendations, evidence status and safety notices.
@@ -142,5 +143,7 @@ The NLP package uses a limited deterministic vocabulary and explicit patterns. I
 - **Phase 8:** Document the explanation contract, add end-to-end scenario coverage and provide a reproducible testing plan — implemented; test execution deferred until deployment.
 - **Phase 9:** Add bounded session history, immutable report snapshots, JSON/CSV/printable HTML exports, output escaping and privacy disclosures — implemented; runtime verification deferred until deployment.
 - **Phase 10:** Final source/security audit, deployment readiness and documented runtime checklist — source audit complete; Community Cloud deployment, runtime acceptance and full test execution remain pending.
+- **Phase 11:** Post-deployment NLP fixes, integer quantity validation and regression automation — in progress.
+- **Phase 12:** Multi-appliance household assessment with isolated per-appliance calculations, household energy/cost totals, highest-consumption identification and safety referral — implemented in source; automated and live verification pending.
 
 A component is implemented only when its source code and documentation exist. Test execution status must be reported separately; authored tests must never be described as passing until they have actually run.
