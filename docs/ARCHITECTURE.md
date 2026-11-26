@@ -9,7 +9,7 @@
 - **Domain:** Energy Management / Electrical Engineering
 - **Primary purpose:** Help households reason about appliance electricity use and identify evidence-supported opportunities to reduce avoidable consumption.
 
-Project identity should be stored centrally in a configuration module during implementation rather than duplicated across UI and service modules.
+Project identity is currently defined in the app/report presentation layer; centralizing branding in a configuration module is a future refactoring, not a deployment blocker.
 
 ## 2. Architecture principles
 
@@ -33,8 +33,8 @@ Project identity should be stored centrally in a configuration module during imp
 | `knowledge_base/` | JSON facts, rules, conclusions, categories, schema and safe draft validation |
 | `expert_system/` | Fact model, rule matcher, forward chaining, backward chaining and conflict handling |
 | `nlp/` | Text normalization, tokenization, controlled phrase mapping, negation and uncertainty handling |
-| `consultation/` | Dialogue state, evidence confirmation, missing-information questions and response assembly |
-| `app.py` | Streamlit consultation and knowledge-base draft-management UI |
+| `consultation/` | Dialogue state, evidence confirmation, missing-information questions, response assembly, history snapshots and report exports |
+| `app.py` | Streamlit consultation, knowledge-base draft-management, history and report UI |
 | `tests/` | Unit, integration, scenario and regression tests |
 | `docs/` | Architecture, knowledge-base, developer, UI, testing and user documentation |
 
