@@ -9,6 +9,7 @@ import streamlit as st
 
 from consultation import ConsultationSession
 from consultation.multi_appliance import assess_multiple_appliances
+from consultation.natural_response import generate_natural_language_answer
 from consultation.history import build_history_entry, export_csv, export_html, export_json
 from knowledge_base import KNOWLEDGE_FILES, load_documents, validate_documents
 
@@ -40,6 +41,8 @@ if "next_multi_appliance_id" not in st.session_state:
     st.session_state.next_multi_appliance_id = 2
 if "last_multi_result" not in st.session_state:
     st.session_state.last_multi_result = None
+if "natural_answer" not in st.session_state:
+    st.session_state.natural_answer = None
 
 session: ConsultationSession = st.session_state.consultation
 
@@ -354,7 +357,32 @@ if multi_result is not None:
     )
     st.caption(multi_result["disclosure"])
 
-st.subheader("5. Check what information is missing")
+st.subheader("5. Ask a question in your own words")
+st.caption(
+    "Ask naturally about your results, electricity use, estimated cost, the highest-consuming "
+    "appliance or practical ways to review usage. Answers are generated from your confirmed "
+    "assessment and the advisor's rules; this is not an unrestricted general-purpose chatbot."
+)
+with st.form("natural_question_form", clear_on_submit=True):
+    user_question = st.text_input(
+        "What would you like to know?",
+        placeholder="e.g. Why is my electricity consumption high?"
+    )
+    ask_submitted = st.form_submit_button("Get an answer", type="primary")
+if ask_submitted:
+    active_result = (
+        st.session_state.last_multi_result
+        if st.session_state.last_multi_result is not None
+        else st.session_state.last_result
+    )
+    st.session_state.natural_answer = generate_natural_language_answer(
+        user_question, active_result
+    )
+if st.session_state.natural_answer:
+    st.markdown("**Advisor's answer**")
+    st.info(st.session_state.natural_answer)
+
+st.subheader("6. Check what information is missing")
 target_options = [
     "energy.monthly_kwh_estimate_available",
     "cost.monthly_variable_estimate_available",
@@ -378,7 +406,7 @@ if st.button("Find missing information"):
             "Review the evidence and any blockers below, then run the assessment."
         )
 
-st.subheader("6. Run the single-appliance assessment")
+st.subheader("7. Run the single-appliance assessment")
 if st.button("Run electricity assessment", type="primary", use_container_width=True):
     try:
         assessment = session.run()
@@ -468,7 +496,7 @@ if result is not None:
     )
 
 st.divider()
-st.subheader("7. Consultation history and reports")
+st.subheader("8. Consultation history and reports")
 history_items = st.session_state.consultation_history
 st.caption(
     f"{len(history_items)} assessment(s) in this browser session. "
