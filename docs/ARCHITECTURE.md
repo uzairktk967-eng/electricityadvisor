@@ -92,8 +92,8 @@ Electricity estimates depend on appliance wattage, operating time, quantity and 
 
 - **Phase 1:** Audit and architecture only — complete.
 - **Phase 2:** Engineer and validate the JSON knowledge base.
-- **Phase 3:** Implement and test the independent symbolic inference engine.
-- **Phase 4:** Implement constrained, explainable lightweight NLP.
+- **Phase 3:** Implement the independent symbolic inference engine — committed; runtime test execution pending.
+- **Phase 4:** Implement constrained, explainable lightweight NLP after Phase 3 tests pass.
 - **Phase 5 onward:** Build consultation, UI, management, testing, reporting and deployment capabilities in sequence.
 
 This document describes the intended design. A component is implemented only when its source code and verification evidence exist in the repository.
