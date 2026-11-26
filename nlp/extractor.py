@@ -24,29 +24,30 @@ class FactCandidate:
 
 
 DEFAULT_PHRASE_MAP = Path(__file__).resolve().parent / "domain_phrases.json"
+NUMBER = r"(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
 
 # Each pattern requires a named numeric value and its domain label/unit.
 NUMERIC_PATTERNS = {
     "appliance.rated_power_w": re.compile(
-        r"(?:rated\s+power|power\s+rating|rating)\s*(?:is|of|:|=)?\s*(\d+(?:\.\d+)?)\s*(?:w|watt|watts)\b"
+        rf"(?:rated\s+power|power\s+rating|rating)\s*(?:is|of|:|=)?\s*{NUMBER}\s*(?:w|watt|watts)\b"
     ),
     "appliance.standby_power_w": re.compile(
-        r"standby\s+(?:power|consumption)\s*(?:is|of|:|=)?\s*(\d+(?:\.\d+)?)\s*(?:w|watt|watts)\b"
+        rf"standby\s+(?:power|consumption)\s*(?:is|of|:|=)?\s*{NUMBER}\s*(?:w|watt|watts)\b"
     ),
     "appliance.quantity": re.compile(
-        r"(?:quantity|number\s+of\s+appliances|i\s+have)\s*(?:is|are|of|:|=)?\s*(\d+(?:\.\d+)?)"
+        rf"(?:quantity|number\s+of\s+appliances|i\s+have)\s*(?:is|are|of|:|=)?\s*{NUMBER}"
     ),
     "usage.hours_per_day": re.compile(
-        r"(?:used?\s+for|usage|operating\s+time)\s*(?:is|of|:|=)?\s*(\d+(?:\.\d+)?)\s*(?:hours?|hrs?)\s*(?:per|/)\s*day"
+        rf"(?:used?\s+for|usage|operating\s+time)\s*(?:is|of|:|=)?\s*{NUMBER}\s*(?:hours?|hrs?)\s*(?:per|/)\s*day"
     ),
     "usage.standby_hours_per_day": re.compile(
-        r"standby\s+(?:time|hours?)\s*(?:is|of|:|=)?\s*(\d+(?:\.\d+)?)\s*(?:hours?|hrs?)\s*(?:per|/)\s*day"
+        rf"standby\s+(?:time|hours?)\s*(?:is|of|:|=)?\s*{NUMBER}\s*(?:hours?|hrs?)\s*(?:per|/)\s*day"
     ),
     "usage.days_per_month": re.compile(
-        r"(\d+(?:\.\d+)?)\s*days?\s*(?:per|/)\s*month"
+        rf"{NUMBER}\s*days?\s*(?:per|/)\s*month"
     ),
     "tariff.price_per_kwh": re.compile(
-        r"(?:tariff|rate|price)\s*(?:is|of|:|=)?\s*(\d+(?:\.\d+)?)\s*(?:per\s*)?(?:kwh|unit)\b"
+        rf"(?:tariff|rate|price)\s*(?:is|of|:|=)?\s*{NUMBER}\s*(?:per\s*)?(?:kwh|unit)\b"
     ),
 }
 
@@ -64,6 +65,11 @@ def _status_for_span(text: str, start: int, end: int, *, boolean: bool = False) 
     return "confirmed", ""
 
 
+def _number(raw: str) -> int | float:
+    value = float(raw.replace(",", ""))
+    return int(value) if value.is_integer() else value
+
+
 def extract_facts(text: str, phrase_map_path: str | Path | None = None) -> list[FactCandidate]:
     """Return candidate facts only; callers must confirm them before inference."""
     if not isinstance(text, str):
@@ -76,10 +82,7 @@ def extract_facts(text: str, phrase_map_path: str | Path | None = None) -> list[
 
     for fact_id, pattern in NUMERIC_PATTERNS.items():
         for match in pattern.finditer(normalized):
-            raw = match.group(1)
-            value = float(raw)
-            if value.is_integer():
-                value = int(value)
+            value = _number(match.group(1))
             status, note = _status_for_span(normalized, match.start(), match.end())
             candidates.append(FactCandidate(
                 fact_id, value, status, text, match.group(0), 0.95 if status == "confirmed" else 0.55, note
@@ -91,15 +94,11 @@ def extract_facts(text: str, phrase_map_path: str | Path | None = None) -> list[
         start = normalized.find(entry["matched_phrase"])
         end = start + len(entry["matched_phrase"])
         status, note = _status_for_span(normalized, start, end, boolean=entry.get("type") == "boolean")
-        if entry.get("type") == "boolean" and status == "confirmed":
-            # A recognized positive symptom or attribute is explicitly asserted.
-            value = bool(value)
         candidates.append(FactCandidate(
             fact_id, value, status, text, entry["matched_phrase"],
             0.95 if status == "confirmed" else 0.55, note
         ))
 
-    # Prefer the longest matched phrase for duplicate fact candidates; preserve numeric candidates.
     deduplicated: dict[tuple[str, str], FactCandidate] = {}
     for candidate in candidates:
         key = (candidate.fact_id, candidate.matched_text)
