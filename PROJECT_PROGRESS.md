@@ -21,7 +21,8 @@
 | 8 | Explainability, validation and automated testing | **Implemented; runtime verification deferred until deployment** |
 | 9 | History, reports and exports | **Implemented; runtime verification deferred until deployment** |
 | 10 | Final audit, documentation and deployment readiness | **Source audit complete; deployment/runtime verification pending** |
-| 11 | Post-deployment bug fixing: NLP robustness and input validation | **In progress; multi-appliance workflow and full regression verification pending** |
+| 11 | Post-deployment bug fixing: NLP robustness and input validation | **Implemented; automated verification pending** |
+| 12 | Multi-appliance household assessment | **Implemented in source; automated and live verification pending** |
 
 ## Phase 1 — Repository audit and architecture
 
@@ -126,6 +127,17 @@
 - Updated NLP documentation to state the expanded phrase coverage and the single-appliance boundary.
 - Remaining work: implement a properly separated multi-appliance workflow, audit other input/engine/UI/report edge cases, execute regression tests, fix failures, and repeat the live acceptance checks.
 
+## Phase 12 — Multi-appliance household assessment (implemented; verification pending)
+
+- Added `consultation/multi_appliance.py`. Each distinct appliance is evaluated in a separate `ConsultationSession`, preventing one appliance's wattage, quantity or runtime from being mixed with another's.
+- Added household aggregation for monthly kWh, optional variable tariff cost, and identification of the highest-consuming appliance.
+- Reuses the existing rule engine for each appliance's energy and cost conclusions; no new formula strings or arbitrary formula evaluation were introduced.
+- Added input validation for names, finite non-negative power and tariff values, integer quantities, daily runtime from 0–24 hours, and monthly usage from 0–31 days.
+- Added Streamlit inputs for multiple appliances, household result table, aggregate totals, and a household electrical-symptom safety referral.
+- Multi-appliance assessments are added to session history with appliance-specific input labels. Their history snapshot is isolated from any separate single-appliance consultation facts.
+- Added eight focused tests in `tests/test_multi_appliance.py`, bringing the authored suite to 64 tests. Tests have not yet been executed; the GitHub Actions workflow was added to run the suite on pushes and pull requests.
+- Acceptance example: 3 × 80 W fans at 10 h/day, 5 × 20 W bulbs at 6 h/day, and 1 × 1,000 W heater at 3 h/day, each for 30 days, should total 180 kWh/month; at Rs. 55/kWh, the estimated variable cost is Rs. 9,900, and the heater is the largest consumer.
+
 ## Verification status
 
 - Phase 7 management code, UI and documentation were fetched back from GitHub during its implementation.
@@ -135,4 +147,6 @@
 
 ## Current next phase
 
-**Phase 11 — Post-deployment bug fixing.** Single-appliance NLP coverage and quantity typing have been improved. Multi-appliance support, full regression execution and deployed runtime verification remain outstanding.
+**Phase 11 — Post-deployment bug fixing.** Single-appliance NLP coverage, punctuation matching, quantity typing and CI test automation have been improved. Automated test execution and deployed runtime verification remain outstanding.
+
+**Phase 12 — Multi-appliance household assessment.** The source implementation now calculates each appliance independently and aggregates household totals, variable cost and highest consumption. Automated test execution and live Streamlit acceptance remain outstanding.
