@@ -37,7 +37,7 @@ class PhraseMap:
             # Word boundaries allow a phrase next to punctuation without
             # matching short entries inside unrelated words (for example "ac"
             # inside "vacation").
-            pattern = re.compile(rf"(?<!\\w){re.escape(phrase)}(?!\\w)")
+            pattern = re.compile(rf"(?<!\w){re.escape(phrase)}(?!\w)")
             if pattern.search(normalized):
                 found.append({**entry, "matched_phrase": phrase})
         return found
