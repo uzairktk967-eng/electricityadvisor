@@ -1,0 +1,173 @@
+{
+  "version": "1.0.0",
+  "rule_language_version": "1.0",
+  "evaluation_policy": {
+    "condition_logic": "all",
+    "unknown_policy": "unknown_never_matches",
+    "rejected_evidence_policy": "rejected_never_matches",
+    "derived_fact_policy": "only_explicit_rule_conclusions",
+    "tie_policy": "retain_all_matching_rules_and_log_priority"
+  },
+  "rules": [
+    {
+      "id": "R-ENERGY-001",
+      "category": "consumption_estimation",
+      "priority": 100,
+      "conditions": [
+        {
+          "fact": "appliance.rated_power_w",
+          "operator": "gt",
+          "value": 0
+        },
+        {
+          "fact": "appliance.quantity",
+          "operator": "gte",
+          "value": 1
+        },
+        {
+          "fact": "usage.hours_per_day",
+          "operator": "gte",
+          "value": 0
+        },
+        {
+          "fact": "usage.days_per_month",
+          "operator": "gte",
+          "value": 0
+        }
+      ],
+      "conclusion": "energy.monthly_kwh_estimate_available",
+      "formula": "rated_power_w * quantity * hours_per_day * days_per_month / 1000",
+      "recommendations": [
+        "rec.verify_power_input"
+      ],
+      "explanation": "Monthly energy can be estimated when rated input power, quantity and operating duration are provided. This assumes constant representative input power while operating.",
+      "threshold_basis": "dimensional_energy_calculation",
+      "limitations": [
+        "For cycling or variable-load appliances, rated power multiplied by hours may over- or under-estimate actual energy; measured kWh is preferable."
+      ]
+    },
+    {
+      "id": "R-COST-001",
+      "category": "cost_estimation",
+      "priority": 100,
+      "conditions": [
+        {
+          "fact": "tariff.price_per_kwh",
+          "operator": "gte",
+          "value": 0
+        }
+      ],
+      "requires_conclusion": "energy.monthly_kwh_estimate_available",
+      "conclusion": "cost.monthly_variable_estimate_available",
+      "formula": "monthly_kwh_estimate * tariff_price_per_kwh",
+      "recommendations": [
+        "rec.use_user_tariff"
+      ],
+      "explanation": "A variable energy-cost estimate follows from estimated kWh and a user-entered rate.",
+      "threshold_basis": "user_supplied_tariff_and_energy_estimate",
+      "limitations": [
+        "Does not calculate a complete utility bill."
+      ]
+    },
+    {
+      "id": "R-STANDBY-001",
+      "category": "standby_consumption",
+      "priority": 100,
+      "conditions": [
+        {
+          "fact": "appliance.measured_power_w",
+          "operator": "gte",
+          "value": 0
+        },
+        {
+          "fact": "usage.standby_hours_per_day",
+          "operator": "gte",
+          "value": 0
+        },
+        {
+          "fact": "usage.days_per_month",
+          "operator": "gte",
+          "value": 0
+        }
+      ],
+      "conclusion": "standby.energy_estimate_available",
+      "formula": "measured_power_w * quantity * standby_hours_per_day * days_per_month / 1000",
+      "recommendations": [
+        "rec.check_standby_controls"
+      ],
+      "explanation": "Standby energy can be estimated only when the power value specifically represents standby-mode power.",
+      "threshold_basis": "dimensional_energy_calculation",
+      "limitations": [
+        "The measured_power_w fact must be explicitly identified as standby-mode measurement for this rule; rated operating power is not a substitute."
+      ]
+    },
+    {
+      "id": "R-USAGE-001",
+      "category": "usage_optimization",
+      "priority": 50,
+      "conditions": [
+        {
+          "fact": "usage.schedule_flexible",
+          "operator": "eq",
+          "value": true
+        },
+        {
+          "fact": "usage.hours_per_day",
+          "operator": "gt",
+          "value": 0
+        }
+      ],
+      "conclusion": "usage.schedule_review_candidate",
+      "recommendations": [
+        "rec.review_runtime"
+      ],
+      "explanation": "If the user says the schedule is flexible, reviewing operating duration or timing may be worthwhile; this does not establish that consumption is excessive.",
+      "threshold_basis": "user_reported_flexibility",
+      "limitations": [
+        "Do not recommend reducing essential or safety-critical use."
+      ]
+    },
+    {
+      "id": "R-SAFETY-001",
+      "category": "electrical_safety",
+      "priority": 1000,
+      "conditions": [
+        {
+          "fact": "supply.has_electrical_symptom",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "conclusion": "safety.professional_inspection_required",
+      "recommendations": [
+        "rec.contact_electrician"
+      ],
+      "explanation": "Reported electrical warning symptoms require professional assessment rather than troubleshooting instructions from this advisor.",
+      "threshold_basis": "conservative_safety_referral_policy",
+      "limitations": [
+        "This rule does not diagnose the cause or severity of the fault."
+      ]
+    },
+    {
+      "id": "R-EFF-001",
+      "category": "appliance_efficiency",
+      "priority": 40,
+      "conditions": [
+        {
+          "fact": "appliance.has_energy_label",
+          "operator": "eq",
+          "value": true
+        }
+      ],
+      "conclusion": "efficiency.specification_comparison_advised",
+      "recommendations": [
+        "rec.compare_energy_labels"
+      ],
+      "explanation": "A verified label or specification enables a more meaningful comparison between appliances providing the same service.",
+      "threshold_basis": "documented_specification_comparison",
+      "limitations": [
+        "The advisor must not rank efficiency without comparable, verified data."
+      ]
+    }
+  ]
+}
