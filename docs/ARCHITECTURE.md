@@ -33,7 +33,7 @@ Project identity is currently defined in the app/report presentation layer; cent
 | `knowledge_base/` | JSON facts, rules, conclusions, categories, schema and safe draft validation |
 | `expert_system/` | Fact model, rule matcher, forward chaining, backward chaining and conflict handling |
 | `nlp/` | Text normalization, tokenization, controlled phrase mapping, negation and uncertainty handling |
-| `consultation/` | Dialogue state, evidence confirmation, missing-information questions, response assembly, independent multi-appliance assessments, history snapshots and report exports |
+| `consultation/` | Dialogue state, evidence confirmation, missing-information questions, rule-based conversational answers, independent multi-appliance assessments, history snapshots and report exports |
 | `app.py` | Streamlit consultation, knowledge-base draft-management, history and report UI |
 | `tests/` | Unit, integration, scenario and regression tests |
 | `docs/` | Architecture, knowledge-base, developer, UI, testing and user documentation |
@@ -49,7 +49,8 @@ Project identity is currently defined in the app/report presentation layer; cent
 6. The inference engine matches validated rules and derives conclusions using forward chaining.
 7. Conflict handling reports unresolved contradictions rather than silently choosing one value.
 8. The consultation service returns conclusions, fired rules, explanations, limitations, rule-linked recommendations, evidence status and safety notices.
-9. Streamlit presents these results; it does not contain a second implementation of the reasoning rules.
+9. A deterministic conversational response helper maps common user questions to plain-language answers using only the supplied assessment result, rule-linked recommendations and safety notices; it does not invent findings.
+10. Streamlit presents these results; it does not contain a second implementation of the reasoning rules.
 
 ## 5. Knowledge-base change flow
 
@@ -104,6 +105,7 @@ See `docs/EXPLAINABILITY.md` for the response contract and `docs/TESTING.md` for
 - The Streamlit structured input control is generated from the fact definitions rather than duplicating the catalogue in UI code.
 - Backward-chaining prompts map missing fact IDs to focused questions.
 - The response assembler exposes only conclusions and recommendations emitted by fired knowledge-base rules.
+- The natural-language answer helper supports common energy/cost/comparison/savings questions with deterministic templates; unsupported questions receive a scope or missing-evidence response. It does not call an external language model.
 - Streamlit session state holds one in-memory consultation, a separate knowledge-base draft and a bounded history of the latest 25 completed assessments for the active browser session. None is durable storage.
 - Completed assessments are snapshotted with a unique ID, UTC timestamp, user-confirmed evidence values/status/provenance and the consultation result. Raw natural-language paragraphs are not copied into report snapshots.
 - Users can inspect prior snapshots, delete one or clear session history, and export one report as JSON, CSV or printable HTML. Full session history can be exported as JSON.
