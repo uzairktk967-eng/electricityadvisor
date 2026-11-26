@@ -150,6 +150,17 @@
 - The implementation uses deterministic local templates and no external AI/API. It is a limited-domain conversational helper, not an unrestricted chatbot. It currently generates English responses; multilingual responses are not implemented.
 - Added six tests in `tests/test_natural_response.py`. The authored suite now contains 70 tests. A previous 64-test revision passed in GitHub Actions; the latest revision with natural-language response tests still needs its own completed successful workflow run and live Streamlit check.
 
+
+## Phase 18 — Broader knowledge-base question answering (implemented; verification pending)
+
+- Reworked consultation/natural_response.py from a small set of keyword branches into a broader deterministic question router for the advisor's documented scope.
+- Added direct answers for kWh/unit meaning, the monthly consumption formula, required inputs, standby-power rules, variable-cost versus complete-bill limitations, actual-versus-estimated consumption, efficiency-label comparisons, and safe usage-review guidance.
+- Added assessment-aware answers for confirmed input values, single-appliance consumption and cost, household totals, highest-consuming appliance, missing confirmed facts, and evidence conflicts.
+- Added explicit unknown-topic responses stating that unsupported subjects are not covered by the current knowledge base; the assistant must not guess.
+- Electrical warning symptoms retain a high-priority qualified-electrician referral.
+- Added nine regression tests for the new FAQ categories, confirmed-input reporting and unknown-topic refusal. The authored test suite count is now 79; tests have not been run and the deployed Streamlit app has not yet been verified.
+- The response helper remains deterministic and local. It does not use an external LLM/API and is not an unrestricted chatbot. New topics must be added to the knowledge base and covered by tests before being advertised as supported.
+
 ## Verification status
 
 - Phase 7 management code, UI and documentation were fetched back from GitHub during its implementation.
