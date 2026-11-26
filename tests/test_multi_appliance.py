@@ -49,5 +49,15 @@ class MultiApplianceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             assess_multiple_appliances(KB, [])
 
+    def test_rejects_non_finite_power(self):
+        items = [dict(self.appliances[0], rated_power_w=float("nan"))]
+        with self.assertRaises(ValueError):
+            assess_multiple_appliances(KB, items)
+
+    def test_rejects_missing_appliance_name(self):
+        items = [dict(self.appliances[0], name="  ")]
+        with self.assertRaises(ValueError):
+            assess_multiple_appliances(KB, items)
+
 if __name__ == "__main__":
     unittest.main()
