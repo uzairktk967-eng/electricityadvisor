@@ -21,8 +21,8 @@
 |---|---|---|
 | 1 | Repository audit and architecture | **Complete** |
 | 2 | Knowledge-base engineering | **Complete** |
-| 3 | Core inference engine (forward/backward chaining, matching, conflict handling) | Next |
-| 4 | Lightweight natural-language processing | Not started |
+| 3 | Core inference engine (forward/backward chaining, matching, conflict handling) | **Implemented; runtime verification pending** |
+| 4 | Lightweight natural-language processing | Next |
 | 5 | Consultation and response engine | Not started |
 | 6 | Streamlit professional UI | Not started |
 | 7 | Knowledge-base management | Not started |
@@ -40,7 +40,7 @@
 
 ## Next phase
 
-**Phase 3 — Core Inference Engine.** Implement typed fact storage, rule matching, forward chaining, backward chaining, deterministic conflict handling and an auditable inference trace. Begin only when the user explicitly says **Next**.
+**Phase 4 — Lightweight NLP.** Implement text normalization, tokenization, domain phrase mapping, negation and uncertainty handling. Start only after the Phase 3 test suite has been run in a Python environment and any failures have been resolved.
 
 ## Phase 2 deliverables
 
@@ -60,3 +60,19 @@
 ## Verification notes
 
 Phases 1 and 2 are documentation/knowledge engineering deliverables. No application runtime, inference engine, automated application test suite or deployment exists yet. No runtime behavior or test pass is claimed.
+
+
+## Phase 3 deliverables
+
+- Added `expert_system/fact_store.py` for typed fact validation, provenance, evidence states and contradictory confirmed-value detection.
+- Added `expert_system/engine.py` for JSON knowledge-base loading, typed rule matching, forward chaining, backward goal analysis, allow-listed calculations, priority ordering and inference traces.
+- Added `expert_system/models.py` and package exports.
+- Added nine standard-library unit tests covering energy/cost calculation, uncertain and rejected evidence, safety referral, standby-specific measurement, contradictory evidence, backward chaining and type validation.
+- Added `docs/INFERENCE_ENGINE.md` describing engine behavior, test instructions and limitations.
+- Formula metadata is never evaluated using Python `eval`; only explicitly registered rule IDs are calculated.
+
+## Phase 3 verification
+
+- GitHub confirmed commits for the engine modules, test suite and documentation.
+- A local test run was attempted, but the execution environment could not resolve `github.com`, so the repository could not be cloned into the runtime.
+- Therefore the nine tests are authored but **not yet executed**. Phase 3 implementation is committed; runtime verification remains pending and must not be represented as passed.
