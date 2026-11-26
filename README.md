@@ -11,6 +11,8 @@ A rule-based, explainable application for estimating household appliance energy 
 - View rule-supported findings, evidence status, conflicts, explanations and recommendations.
 - Receive a safety referral when electrical warning symptoms are reported.
 - Prepare knowledge-base JSON drafts, validate schema and cross-file references, and export a validated bundle.
+- Review the latest 25 completed assessments within the active browser session.
+- Export individual assessment reports as JSON, CSV or printable HTML; export session history as JSON.
 
 ## Run locally
 
@@ -31,14 +33,14 @@ streamlit run app.py
 
 The Streamlit entry point is `app.py`. For Streamlit Community Cloud, select this repository, branch `main`, and main file path `app.py`. Dependencies are declared in the root `requirements.txt`.
 
-See [Streamlit UI and deployment notes](docs/STREAMLIT_UI.md) and [Knowledge-Base Management](docs/KNOWLEDGE_BASE_MANAGEMENT.md).
+See [Streamlit UI and deployment notes](docs/STREAMLIT_UI.md), [Knowledge-Base Management](docs/KNOWLEDGE_BASE_MANAGEMENT.md), [History and Reports](docs/HISTORY_AND_REPORTS.md), and [Testing Plan](docs/TESTING.md).
 
 ## Architecture
 
 - `knowledge_base/`: JSON facts, rules, conclusions, recommendations, schema and draft validation.
 - `expert_system/`: evidence-aware forward and backward chaining.
 - `nlp/`: constrained natural-language fact candidate extraction.
-- `consultation/`: review workflow and response assembly.
+- `consultation/`: review workflow, response assembly, session history snapshots and report exports.
 - `app.py`: Streamlit consultation and knowledge-base management interface.
 - `tests/`: authored unit tests for inference, NLP, consultation and knowledge-base validation.
 
