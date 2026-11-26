@@ -65,10 +65,62 @@ def complete_reviewed_assessment() -> None:
         st.session_state.consultation_history = (
             st.session_state.consultation_history[:MAX_HISTORY_ITEMS]
         )
-        st.session_state.natural_answer = generate_natural_language_answer(
-            "Explain my assessment and monthly electricity consumption.",
-            assessment,
-        )
+        # Build a complete user-facing answer, including both kWh and cost.
+        # The symbolic engine remains the source of rule-supported conclusions;
+        # this transparent arithmetic fallback prevents a silent/no-answer UX
+        # when the engine cannot assemble a conclusion from otherwise complete facts.
+        evidence = session.evidence_summary()
+        required = {
+            "appliance.rated_power_w": "rated power",
+            "appliance.quantity": "quantity",
+            "usage.hours_per_day": "hours per day",
+            "usage.days_per_month": "days per month",
+        }
+        missing = [
+            label for fact_id, label in required.items()
+            if evidence.get(fact_id, {}).get("status") != "confirmed"
+            or evidence.get(fact_id, {}).get("value") is None
+        ]
+        tariff_item = evidence.get("tariff.price_per_kwh", {})
+        tariff = tariff_item.get("value") if tariff_item.get("status") == "confirmed" else None
+        if not assessment.get("conclusions", {}).get("energy.monthly_kwh_estimate_available") and not missing:
+            power = float(evidence["appliance.rated_power_w"]["value"])
+            quantity = int(evidence["appliance.quantity"]["value"])
+            hours = float(evidence["usage.hours_per_day"]["value"])
+            days = float(evidence["usage.days_per_month"]["value"])
+            monthly_kwh = power * quantity * hours * days / 1000
+            assessment.setdefault("conclusions", {})["energy.monthly_kwh_estimate_available"] = {
+                "value": monthly_kwh, "unit": "kWh/month",
+                "caveat": "Transparent arithmetic fallback using confirmed user inputs."
+            }
+        energy_item = assessment.get("conclusions", {}).get("energy.monthly_kwh_estimate_available")
+        if missing:
+            st.session_state.natural_answer = (
+                "I extracted and reviewed your information, but I still need "
+                + ", ".join(missing)
+                + " before I can calculate a reliable monthly estimate. Please add the missing details in the structured information section."
+            )
+        elif energy_item is not None:
+            monthly_kwh = float(energy_item["value"])
+            answer = (
+                f"Your appliance is estimated to consume {monthly_kwh:,.2f} kWh "
+                f"({monthly_kwh:,.2f} electricity units) per month."
+            )
+            if tariff is not None:
+                monthly_cost = monthly_kwh * float(tariff)
+                answer += (
+                    f" At your entered tariff of Rs. {float(tariff):,.2f} per kWh, "
+                    f"the estimated variable energy cost is Rs. {monthly_cost:,.2f} per month. "
+                    "This is not your complete electricity bill; fixed charges, taxes, tariff slabs and adjustments may be excluded."
+                )
+            else:
+                answer += " Add your tariff per kWh to estimate the variable electricity cost."
+            st.session_state.natural_answer = answer
+        else:
+            st.session_state.natural_answer = generate_natural_language_answer(
+                "Explain my assessment and monthly electricity consumption.",
+                assessment,
+            )
     except Exception as exc:
         st.session_state.last_result = None
         st.session_state.natural_answer = (
@@ -187,6 +239,10 @@ else:
                         clear_result()
                         complete_reviewed_assessment()
                         st.rerun()
+
+if st.session_state.natural_answer:
+    st.markdown("**Your assessment answer**")
+    st.success(st.session_state.natural_answer)
 
 st.subheader("3. Add structured information")
 st.write(
