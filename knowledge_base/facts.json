@@ -1,0 +1,109 @@
+{
+  "version": "1.0.0",
+  "description": "Fact catalogue. Values are supplied per consultation; this file defines recognized inputs, not a household profile.",
+  "facts": [
+    {
+      "id": "appliance.name",
+      "type": "string",
+      "unit": null,
+      "description": "User-selected or described appliance name.",
+      "evidence": "user_input"
+    },
+    {
+      "id": "appliance.quantity",
+      "type": "number",
+      "unit": "count",
+      "description": "Number of equivalent appliances.",
+      "evidence": "user_input",
+      "minimum": 1
+    },
+    {
+      "id": "appliance.rated_power_w",
+      "type": "number",
+      "unit": "W",
+      "description": "Rated input power from the appliance label or manufacturer documentation.",
+      "evidence": "user_input",
+      "minimum": 0
+    },
+    {
+      "id": "appliance.measured_power_w",
+      "type": "number",
+      "unit": "W",
+      "description": "Power measured using a suitable plug-in power meter; not inferred from rated power.",
+      "evidence": "user_input",
+      "minimum": 0
+    },
+    {
+      "id": "usage.hours_per_day",
+      "type": "number",
+      "unit": "hours/day",
+      "description": "Average operating hours per day for one appliance.",
+      "evidence": "user_input",
+      "minimum": 0,
+      "maximum": 24
+    },
+    {
+      "id": "usage.days_per_month",
+      "type": "number",
+      "unit": "days/month",
+      "description": "Number of days the appliance is used in the billing month.",
+      "evidence": "user_input",
+      "minimum": 0,
+      "maximum": 31
+    },
+    {
+      "id": "tariff.price_per_kwh",
+      "type": "number",
+      "unit": "currency/kWh",
+      "description": "User-entered applicable marginal energy rate; currency and billing components must be stated separately.",
+      "evidence": "user_input",
+      "minimum": 0
+    },
+    {
+      "id": "usage.standby_hours_per_day",
+      "type": "number",
+      "unit": "hours/day",
+      "description": "Hours per day the appliance remains energized in standby mode.",
+      "evidence": "user_input",
+      "minimum": 0,
+      "maximum": 24
+    },
+    {
+      "id": "appliance.has_energy_label",
+      "type": "boolean",
+      "unit": null,
+      "description": "Whether the user has an energy label or manufacturer specification available.",
+      "evidence": "user_input"
+    },
+    {
+      "id": "appliance.condition_issue",
+      "type": "enum",
+      "unit": null,
+      "description": "User-reported abnormal operation or condition concern.",
+      "evidence": "user_input",
+      "allowed_values": [
+        "none_reported",
+        "unusual_noise",
+        "unusual_heat",
+        "frequent_cycling",
+        "poor_performance",
+        "visible_damage",
+        "unknown"
+      ]
+    },
+    {
+      "id": "supply.has_electrical_symptom",
+      "type": "boolean",
+      "unit": null,
+      "description": "Whether user reports sparks, burning smell, shocks, repeated breaker trips or hot wiring/outlets.",
+      "evidence": "user_input"
+    },
+    {
+      "id": "usage.schedule_flexible",
+      "type": "boolean",
+      "unit": null,
+      "description": "Whether appliance use can be shifted without affecting essential needs or safety.",
+      "evidence": "user_input"
+    }
+  ]
+}
