@@ -63,6 +63,19 @@ class ConsultationHistoryTests(unittest.TestCase):
         rows = list(csv.DictReader(StringIO(export_csv(malicious))))
         self.assertEqual(rows[0]["label"], '\'=HYPERLINK("https://example.invalid")')
 
+    def test_csv_export_neutralizes_formula_after_leading_whitespace(self):
+        malicious = dict(self.entry)
+        malicious["facts"] = [{
+            "fact_id": "test.fact",
+            "label": '  =SUM(1,1)',
+            "value": "normal",
+            "status": "confirmed",
+            "source": "test",
+            "note": "",
+        }]
+        rows = list(csv.DictReader(StringIO(export_csv(malicious))))
+        self.assertEqual(rows[0]["label"], "'  =SUM(1,1)")
+
     def test_html_report_escapes_untrusted_fact_values(self):
         # Exercise escaping independently of the catalogue's normal type constraints.
         malicious = dict(self.entry)
