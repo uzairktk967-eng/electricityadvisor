@@ -76,6 +76,33 @@ class ExtractionTests(unittest.TestCase):
         self.assertIn(("usage.hours_per_day", 4.5), pairs)
         self.assertIn(("usage.days_per_month", 28), pairs)
 
+
+    def test_extract_question_one_two_fans(self):
+        facts = extract_facts(
+            "I have two electric fans, each rated at 75 W. "
+            "They run for 12 hours daily for 30 days. "
+            "My electricity tariff is Rs. 55 per kWh."
+        )
+        pairs = {(item.fact_id, item.value) for item in facts}
+        self.assertIn(("appliance.quantity", 2), pairs)
+        self.assertIn(("appliance.rated_power_w", 75), pairs)
+        self.assertIn(("usage.hours_per_day", 12), pairs)
+        self.assertIn(("usage.days_per_month", 30), pairs)
+        self.assertIn(("tariff.price_per_kwh", 55), pairs)
+
+    def test_extract_question_two_refrigerator_approximate_runtime(self):
+        facts = extract_facts(
+            "My refrigerator has a rated power of 200 W and operates "
+            "for approximately 8 hours per day. Calculate usage for 30 days "
+            "at Rs. 55 per kWh. I have one refrigerator."
+        )
+        pairs = {(item.fact_id, item.value) for item in facts}
+        self.assertIn(("appliance.quantity", 1), pairs)
+        self.assertIn(("appliance.rated_power_w", 200), pairs)
+        self.assertIn(("usage.hours_per_day", 8), pairs)
+        self.assertIn(("usage.days_per_month", 30), pairs)
+        self.assertIn(("tariff.price_per_kwh", 55), pairs)
+
     def test_domain_phrases_match_next_to_punctuation(self):
         facts = extract_facts("There are sparks, and my schedule is flexible.")
         pairs = {(item.fact_id, item.value) for item in facts}
