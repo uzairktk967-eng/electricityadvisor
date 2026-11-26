@@ -23,33 +23,31 @@ Project identity should be stored centrally in a configuration module during imp
 8. Use lightweight storage and document persistence limits clearly.
 9. NLP proposes candidate facts only; it must not infer conclusions or silently confirm ambiguous evidence.
 
-## 3. Proposed logical components
+## 3. Logical components
 
 | Component | Responsibility |
 |---|---|
-| `config/` | Central project identity and application settings |
 | `knowledge_base/` | JSON facts, rules, conclusions, categories and recommendations |
-| `expert_system/` | Fact model, rule matcher, forward chaining, backward chaining and conflict resolution |
+| `expert_system/` | Fact model, rule matcher, forward chaining, backward chaining and conflict handling |
 | `nlp/` | Text normalization, tokenization, controlled phrase mapping, negation and uncertainty handling |
 | `consultation/` | Dialogue state, evidence confirmation, missing-information questions and response assembly |
-| `explainability/` | Inference trace and human-readable explanations |
-| `validation/` | Knowledge-base schema, reference, duplicate and consistency checks |
-| `reports/` | Consultation/test report generation and export helpers |
-| `storage/` | Session/history persistence adapter, with a documented lightweight backend |
-| `ui/` | Streamlit pages and reusable presentation components |
+| `app.py` | Streamlit presentation and user interaction |
 | `tests/` | Unit, integration, scenario and regression tests |
-| `docs/` | Architecture, user, developer, testing, NLP and academic documentation |
+| `docs/` | Architecture, knowledge-base, developer, UI, testing and user documentation |
 
-## 4. Intended consultation data flow
+Future components for validation, explainability, reporting and storage may be introduced in their designated phases.
 
-1. The user describes an electricity-use concern and provides appliance and usage details.
+## 4. Consultation data flow
+
+1. The user describes an appliance or electricity-use concern and provides appliance and usage details.
 2. NLP extracts candidate facts with confidence/ambiguity metadata; it does not decide conclusions.
-3. The consultation layer asks focused questions for missing or ambiguous evidence and requests confirmation of extracted candidates.
-4. Confirmed and rejected evidence is stored as explicit facts with provenance.
-5. The inference engine matches validated rules and derives conclusions using forward chaining; backward chaining identifies evidence needed for a requested hypothesis.
-6. Conflict handling applies documented priorities and reports unresolved conflicts rather than hiding them.
-7. The response layer returns conclusions, fired rules, explanations, limitations, rule-linked recommendations, evidence status and safety notices.
-8. The UI presents the consultation and trace; optional history/report services store or export it.
+3. The UI displays candidates and requires explicit confirmation or rejection.
+4. The consultation layer records reviewed evidence with provenance. Structured facts are validated against the fact catalogue.
+5. Backward chaining identifies evidence needed for a requested target conclusion.
+6. The inference engine matches validated rules and derives conclusions using forward chaining.
+7. Conflict handling reports unresolved contradictions rather than silently choosing one value.
+8. The consultation service returns conclusions, fired rules, explanations, limitations, rule-linked recommendations, evidence status and safety notices.
+9. Streamlit presents these results; it does not contain a second implementation of the reasoning rules.
 
 ## 5. Core data concepts
 
@@ -70,15 +68,17 @@ Project identity should be stored centrally in a configuration module during imp
 - **Multiple conclusions:** Permit multiple independently supported conclusions in one consultation.
 - **Contradictions:** Preserve conflicting evidence and surface it for clarification; do not silently choose one value.
 
-## 7. Consultation design
+## 7. Consultation and UI design
 
 - NLP candidates remain separate from the fact store until the user explicitly reviews them.
 - Direct structured inputs pass through the fact catalogue's type and range validation.
-- Backward chaining maps missing fact IDs to focused questions.
+- The Streamlit structured input control is generated from the fact definitions rather than duplicating the catalogue in UI code.
+- Backward-chaining prompts map missing fact IDs to focused questions.
 - The response assembler exposes only conclusions and recommendations emitted by fired knowledge-base rules.
-- The current consultation session is in-memory only; durable history is a later concern.
+- Streamlit session state holds one in-memory consultation for the active browser session. It is not durable history; a reload or ended session may clear it.
+- No database, user account, durable history or report export is implemented in this phase.
 
-## 8. Initial technology choices
+## 8. Technology choices
 
 - Python for application and reasoning logic.
 - Streamlit for the user interface.
@@ -91,7 +91,9 @@ No paid API or hosted service is required for core reasoning.
 
 ## 9. Quality and safety boundaries
 
-Electricity estimates depend on appliance wattage, operating time, quantity and tariff assumptions. The system must distinguish user-provided measurements from estimates and disclose assumptions. Estimated savings are not guaranteed bill reductions. Electrical installation, wiring faults and hazardous repair advice are outside the scope of ordinary energy-saving recommendations; users should be directed to a qualified electrician for such issues.
+Electricity estimates depend on appliance wattage, operating time, quantity and tariff assumptions. The system must distinguish user-provided measurements from estimates and disclose assumptions. Cost is a variable estimate based on the entered rate, not a complete utility bill; fixed charges, taxes, slabs, duties and adjustments may be excluded. Estimated savings are not guaranteed.
+
+Electrical installation, wiring faults and hazardous repair advice are outside the scope of ordinary energy-saving recommendations; users should be directed to a qualified electrician for such issues.
 
 The NLP package uses a limited deterministic vocabulary and explicit patterns. It may miss paraphrases or ambiguous wording. It must return candidates for user confirmation and must not present its confidence indicator as a calibrated probability.
 
@@ -99,9 +101,10 @@ The NLP package uses a limited deterministic vocabulary and explicit patterns. I
 
 - **Phase 1:** Audit and architecture — complete.
 - **Phase 2:** Engineer and structurally validate the JSON knowledge base — complete.
-- **Phase 3:** Implement the independent symbolic inference engine — implemented; runtime verification deferred until Streamlit deployment at the developer's request.
-- **Phase 4:** Implement constrained, explainable lightweight NLP — implemented; runtime verification deferred until Streamlit deployment.
-- **Phase 5:** Implement consultation orchestration and response assembly — implemented; runtime verification deferred until Streamlit deployment.
-- **Phase 6 onward:** Build the Streamlit UI, knowledge-base management, validation, reports and deployment capabilities in sequence.
+- **Phase 3:** Implement the independent symbolic inference engine — implemented; runtime verification deferred until deployment.
+- **Phase 4:** Implement constrained, explainable lightweight NLP — implemented; runtime verification deferred until deployment.
+- **Phase 5:** Implement consultation orchestration and response assembly — implemented; runtime verification deferred until deployment.
+- **Phase 6:** Implement Streamlit presentation, candidate review, structured inputs, missing-information prompts and results — implemented; runtime verification deferred until deployment.
+- **Phase 7 onward:** Knowledge-base management, validation, history, reports and final deployment readiness remain future work.
 
 A component is implemented only when its source code and documentation exist. Test execution status must be reported separately; authored tests must never be described as passing until they have actually run.
