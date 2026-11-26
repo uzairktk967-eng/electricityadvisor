@@ -83,8 +83,42 @@ def assess_multiple_appliances(
         if highest is None or kwh > highest["monthly_kwh"]:
             highest = row
 
+    explanations = []
+    recommendations = []
+    fired_rules = []
+    conflicts = []
+    for row in results:
+        row_result = row["result"]
+        explanations.extend(row_result.get("explanations", []))
+        conflicts.extend(row_result.get("conflicts", []))
+        for rule_id in row_result.get("fired_rules", []):
+            if rule_id not in fired_rules:
+                fired_rules.append(rule_id)
+        for recommendation in row_result.get("recommendations", []):
+            if recommendation["id"] not in {item["id"] for item in recommendations}:
+                recommendations.append(recommendation)
+
+    conclusions = {
+        "energy.monthly_kwh_estimate_available": {
+            "value": total_kwh, "unit": "kWh/month",
+            "caveat": "Household total is the sum of independently assessed appliance estimates.",
+            "rule_ids": ["R-ENERGY-001"],
+        }
+    }
+    if tariff_per_kwh is not None:
+        conclusions["cost.monthly_variable_estimate_available"] = {
+            "value": total_kwh * float(tariff_per_kwh), "unit": "currency/month",
+            "caveat": "Variable energy estimate only; not a complete utility bill.",
+            "rule_ids": ["R-COST-001"],
+        }
+
     return {
         "appliances": results,
+        "conclusions": conclusions,
+        "explanations": explanations,
+        "recommendations": recommendations,
+        "conflicts": conflicts,
+        "fired_rules": fired_rules,
         "total_monthly_kwh": total_kwh,
         "tariff_per_kwh": float(tariff_per_kwh) if tariff_per_kwh is not None else None,
         "total_monthly_variable_cost": (
