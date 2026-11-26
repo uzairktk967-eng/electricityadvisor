@@ -177,9 +177,10 @@ st.caption(
     "You can describe one appliance here. For a household with several different appliances, "
     "use the separate multi-appliance assessment below so each appliance keeps its own inputs."
 )
-with st.form("description_form", clear_on_submit=True):
+with st.form("description_form", clear_on_submit=False):
     description = st.text_area(
         "Describe the appliance, its power rating, usage and any concern",
+        key="description_input",
         placeholder=(
             "Example: My refrigerator has rated power 150 W, "
             "I use it for 8 hours per day, and I have one."
