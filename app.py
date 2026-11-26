@@ -43,6 +43,8 @@ if "last_multi_result" not in st.session_state:
     st.session_state.last_multi_result = None
 if "natural_answer" not in st.session_state:
     st.session_state.natural_answer = None
+if "last_user_question" not in st.session_state:
+    st.session_state.last_user_question = None
 
 session: ConsultationSession = st.session_state.consultation
 
@@ -153,6 +155,7 @@ with st.sidebar:
         st.session_state.last_result = None
         st.session_state.last_multi_result = None
         st.session_state.natural_answer = None
+        st.session_state.last_user_question = None
         st.session_state.multi_appliance_rows = [{"id": 1}]
         st.session_state.next_multi_appliance_id = 2
         st.rerun()
@@ -448,24 +451,32 @@ st.caption(
     "appliance or practical ways to review usage. Answers are generated from your confirmed "
     "assessment and the advisor's rules; this is not an unrestricted general-purpose chatbot."
 )
-with st.form("natural_question_form", clear_on_submit=True):
+with st.form("natural_question_form", clear_on_submit=False):
     user_question = st.text_input(
         "What would you like to know?",
-        placeholder="e.g. Why is my electricity consumption high?"
+        placeholder="e.g. Why is my electricity consumption high?",
+        key="natural_question_input",
     )
     ask_submitted = st.form_submit_button("Get an answer", type="primary")
 if ask_submitted:
-    active_result = (
-        st.session_state.last_multi_result
-        if st.session_state.last_multi_result is not None
-        else st.session_state.last_result
-    )
-    st.session_state.natural_answer = generate_natural_language_answer(
-        user_question, active_result
-    )
+    if user_question.strip():
+        st.session_state.last_user_question = user_question.strip()
+        active_result = (
+            st.session_state.last_multi_result
+            if st.session_state.last_multi_result is not None
+            else st.session_state.last_result
+        )
+        st.session_state.natural_answer = generate_natural_language_answer(
+            user_question.strip(), active_result
+        )
+    else:
+        st.warning("Please enter a question before requesting an answer.")
 if st.session_state.natural_answer:
+    if st.session_state.last_user_question:
+        st.markdown("**Your question**")
+        st.info(st.session_state.last_user_question)
     st.markdown("**Advisor's answer**")
-    st.info(st.session_state.natural_answer)
+    st.success(st.session_state.natural_answer)
 
 st.subheader("6. Check what information is missing")
 target_options = [
