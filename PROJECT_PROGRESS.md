@@ -66,7 +66,7 @@
 - Numeric parsing preserves grouped thousands (for example, 1,500 W) rather than interpreting it as a decimal.
 
 ### Verification status
-- Eight NLP unit tests are authored but have not been executed.
+- Nine NLP unit tests are authored but have not been executed.
 - Runtime verification is deferred until Streamlit deployment, as agreed with the developer.
 
 ## Current next phase
