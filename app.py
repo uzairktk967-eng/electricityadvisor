@@ -52,6 +52,31 @@ def clear_result() -> None:
     st.session_state.natural_answer = None
 
 
+def complete_reviewed_assessment() -> None:
+    """Run an assessment automatically once every extracted candidate is reviewed."""
+    if not session.candidates or len(session.reviewed) < len(session.candidates):
+        return
+    try:
+        assessment = session.run()
+        st.session_state.last_multi_result = None
+        st.session_state.last_result = assessment
+        history_entry = build_history_entry(session, assessment)
+        st.session_state.consultation_history.insert(0, history_entry)
+        st.session_state.consultation_history = (
+            st.session_state.consultation_history[:MAX_HISTORY_ITEMS]
+        )
+        st.session_state.natural_answer = generate_natural_language_answer(
+            "Explain my assessment and monthly electricity consumption.",
+            assessment,
+        )
+    except Exception as exc:
+        st.session_state.last_result = None
+        st.session_state.natural_answer = (
+            f"I could not complete the assessment: {exc}. "
+            "Please check the confirmed inputs and try again."
+        )
+
+
 def render_value(value, unit: str | None = None) -> str:
     if isinstance(value, bool):
         rendered = "Yes" if value else "No"
@@ -154,11 +179,13 @@ else:
                     if st.button(confirm_label, key=f"confirm_{index}", use_container_width=True):
                         session.review_candidate(index, confirm=True)
                         clear_result()
+                        complete_reviewed_assessment()
                         st.rerun()
                 with right:
                     if st.button("Reject candidate", key=f"reject_{index}", use_container_width=True):
                         session.review_candidate(index, confirm=False)
                         clear_result()
+                        complete_reviewed_assessment()
                         st.rerun()
 
 st.subheader("3. Add structured information")
