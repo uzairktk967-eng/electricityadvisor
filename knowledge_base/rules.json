@@ -80,6 +80,11 @@
           "value": 0
         },
         {
+          "fact": "appliance.quantity",
+          "operator": "gte",
+          "value": 1
+        },
+        {
           "fact": "usage.standby_hours_per_day",
           "operator": "gte",
           "value": 0
