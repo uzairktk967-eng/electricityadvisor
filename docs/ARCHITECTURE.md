@@ -103,9 +103,12 @@ See `docs/EXPLAINABILITY.md` for the response contract and `docs/TESTING.md` for
 - The Streamlit structured input control is generated from the fact definitions rather than duplicating the catalogue in UI code.
 - Backward-chaining prompts map missing fact IDs to focused questions.
 - The response assembler exposes only conclusions and recommendations emitted by fired knowledge-base rules.
-- Streamlit session state holds one in-memory consultation and a separate knowledge-base draft for the active browser session. Neither is durable storage.
+- Streamlit session state holds one in-memory consultation, a separate knowledge-base draft and a bounded history of the latest 25 completed assessments for the active browser session. None is durable storage.
+- Completed assessments are snapshotted with a unique ID, UTC timestamp, user-confirmed evidence values/status/provenance and the consultation result. Raw natural-language paragraphs are not copied into report snapshots.
+- Users can inspect prior snapshots, delete one or clear session history, and export one report as JSON, CSV or printable HTML. Full session history can be exported as JSON.
+- HTML report values are escaped; CSV text values with spreadsheet-formula prefixes are neutralized. Reports are generated in memory and downloaded; the app does not persist them on its server filesystem.
 - The knowledge-base management UI never writes to active JSON files or commits to GitHub. It exports a complete validated bundle for manual repository review.
-- No database, user account, durable history or report export is implemented in this phase.
+- No durable database, user account or cross-session history is implemented. Persistent history requires a separately configured durable storage provider, access controls and retention/privacy policy.
 
 ## 10. Technology choices
 
@@ -137,6 +140,7 @@ The NLP package uses a limited deterministic vocabulary and explicit patterns. I
 - **Phase 6:** Implement Streamlit presentation, candidate review, structured inputs, missing-information prompts and results — implemented; runtime verification deferred until deployment.
 - **Phase 7:** Implement safe knowledge-base draft editing, JSON Schema and semantic validation, and validated bundle export — implemented; runtime verification deferred until deployment.
 - **Phase 8:** Document the explanation contract, add end-to-end scenario coverage and provide a reproducible testing plan — implemented; test execution deferred until deployment.
-- **Phase 9 onward:** Add consultation history, reports/exports and final deployment readiness.
+- **Phase 9:** Add bounded session history, immutable report snapshots, JSON/CSV/printable HTML exports, output escaping and privacy disclosures — implemented; runtime verification deferred until deployment.
+- **Phase 10:** Final source/security audit, deployment readiness, full test execution and documented runtime verification — next.
 
 A component is implemented only when its source code and documentation exist. Test execution status must be reported separately; authored tests must never be described as passing until they have actually run.
