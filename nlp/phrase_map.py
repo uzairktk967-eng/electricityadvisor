@@ -1,6 +1,7 @@
 """Phrase matching helpers for the controlled domain vocabulary."""
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -29,10 +30,14 @@ class PhraseMap:
             seen.add(key)
 
     def matches(self, text: str) -> list[dict[str, Any]]:
-        normalized = f" {normalize_text(text)} "
+        normalized = normalize_text(text)
         found = []
         for entry in sorted(self.entries, key=lambda item: len(normalize_text(item["phrase"])), reverse=True):
             phrase = normalize_text(entry["phrase"])
-            if f" {phrase} " in normalized:
+            # Word boundaries allow a phrase next to punctuation without
+            # matching short entries inside unrelated words (for example "ac"
+            # inside "vacation").
+            pattern = re.compile(rf"(?<!\\w){re.escape(phrase)}(?!\\w)")
+            if pattern.search(normalized):
                 found.append({**entry, "matched_phrase": phrase})
         return found
