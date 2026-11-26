@@ -140,6 +140,23 @@ def extract_facts(text: str, phrase_map_path: str | Path | None = None) -> list[
             0.95 if status == "confirmed" else 0.55, note
         ))
 
+    # A singular named appliance in a single-appliance description represents
+    # one unit when the user has not supplied a separate quantity.
+    quantity_already_found = any(
+        candidate.fact_id == "appliance.quantity" for candidate in candidates
+    )
+    named_appliances = [
+        candidate for candidate in candidates
+        if candidate.fact_id == "appliance.name"
+    ]
+    if not quantity_already_found and len(named_appliances) == 1:
+        named = named_appliances[0]
+        candidates.append(FactCandidate(
+            "appliance.quantity", 1, named.status, text, named.matched_text,
+            named.confidence,
+            "Inferred as one from the singular appliance description; confirm before calculation."
+        ))
+
     deduplicated: dict[tuple[str, str], FactCandidate] = {}
     for candidate in candidates:
         key = (candidate.fact_id, candidate.matched_text)
