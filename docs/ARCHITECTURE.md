@@ -23,6 +23,8 @@ Project identity should be stored centrally in a configuration module during imp
 8. Use lightweight storage and document persistence limits clearly.
 9. NLP proposes candidate facts only; it must not infer conclusions or silently confirm ambiguous evidence.
 10. Never execute formula strings or arbitrary expressions from editable knowledge-base files.
+11. Keep user-facing explanations grounded in the inference trace and source evidence.
+12. Distinguish authored tests, executed tests, failures and tests deferred until deployment.
 
 ## 3. Logical components
 
@@ -78,8 +80,23 @@ Formula strings are declarative metadata. The validator accepts only exact formu
 - **Conflict resolution:** Use explicit priority and a deterministic tie policy; retain an audit trace of competing rules.
 - **Multiple conclusions:** Permit multiple independently supported conclusions in one consultation.
 - **Contradictions:** Preserve conflicting evidence and surface it for clarification; do not silently choose one value.
+- **Calculations:** Use explicit allow-listed implementations; formula metadata is never evaluated as Python or arbitrary code.
 
-## 8. Consultation and UI design
+## 8. Explainability and validation
+
+- Every conclusion must identify the rule or rules that produced it, its value/unit and its caveat.
+- Each fired-rule trace includes rule ID, iteration, conditions, conclusion/value, priority, explanation, limitations and linked recommendations.
+- Non-firing trace states distinguish not matched, waiting for prerequisite, evidence conflict, derived conflict and iteration-limit stop.
+- Evidence summaries retain status and record count for each known fact; source/provenance is retained in the fact store.
+- Recommendations are surfaced only from rules that fired and are deduplicated by recommendation ID.
+- Uncertain, rejected, missing and conflicting evidence cannot satisfy rule conditions.
+- Natural-language candidates remain outside inference until explicitly reviewed.
+- The Streamlit UI may format the trace but must not author independent findings, explanations or recommendations.
+- Variable energy cost is disclosed as an estimate using the entered rate, not a complete utility bill. Savings are not guaranteed.
+
+See `docs/EXPLAINABILITY.md` for the response contract and `docs/TESTING.md` for scenario coverage and verification procedure.
+
+## 9. Consultation and UI design
 
 - NLP candidates remain separate from the fact store until the user explicitly reviews them.
 - Direct structured inputs pass through the fact catalogue's type and range validation.
@@ -90,7 +107,7 @@ Formula strings are declarative metadata. The validator accepts only exact formu
 - The knowledge-base management UI never writes to active JSON files or commits to GitHub. It exports a complete validated bundle for manual repository review.
 - No database, user account, durable history or report export is implemented in this phase.
 
-## 9. Technology choices
+## 10. Technology choices
 
 - Python for application and reasoning logic.
 - Streamlit for the user interface.
@@ -102,7 +119,7 @@ Formula strings are declarative metadata. The validator accepts only exact formu
 
 No paid API or hosted service is required for core reasoning.
 
-## 10. Quality and safety boundaries
+## 11. Quality and safety boundaries
 
 Electricity estimates depend on appliance wattage, operating time, quantity and tariff assumptions. The system must distinguish user-provided measurements from estimates and disclose assumptions. Cost is a variable estimate based on the entered rate, not a complete utility bill; fixed charges, taxes, slabs, duties and adjustments may be excluded. Estimated savings are not guaranteed.
 
@@ -110,7 +127,7 @@ Electrical installation, wiring faults and hazardous repair advice are outside t
 
 The NLP package uses a limited deterministic vocabulary and explicit patterns. It may miss paraphrases or ambiguous wording. It must return candidates for user confirmation and must not present its confidence indicator as a calibrated probability.
 
-## 11. Phase boundaries and verification
+## 12. Phase boundaries and verification
 
 - **Phase 1:** Audit and architecture — complete.
 - **Phase 2:** Engineer and structurally validate the JSON knowledge base — complete.
@@ -119,6 +136,7 @@ The NLP package uses a limited deterministic vocabulary and explicit patterns. I
 - **Phase 5:** Implement consultation orchestration and response assembly — implemented; runtime verification deferred until deployment.
 - **Phase 6:** Implement Streamlit presentation, candidate review, structured inputs, missing-information prompts and results — implemented; runtime verification deferred until deployment.
 - **Phase 7:** Implement safe knowledge-base draft editing, JSON Schema and semantic validation, and validated bundle export — implemented; runtime verification deferred until deployment.
-- **Phase 8 onward:** Expand explainability, automated testing, history, reports and final deployment readiness.
+- **Phase 8:** Document the explanation contract, add end-to-end scenario coverage and provide a reproducible testing plan — implemented; test execution deferred until deployment.
+- **Phase 9 onward:** Add consultation history, reports/exports and final deployment readiness.
 
 A component is implemented only when its source code and documentation exist. Test execution status must be reported separately; authored tests must never be described as passing until they have actually run.
