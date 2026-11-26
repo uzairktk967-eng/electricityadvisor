@@ -2,7 +2,7 @@
 
 ## Current status
 
-Automated tests are authored but have not been executed in this development workflow. The developer requested runtime testing after Streamlit deployment. Do not describe the suite as passing until it has actually been run and its output reviewed.
+Automated tests are authored. GitHub Actions has reported a successful run for the previous 64-test revision; the current 70-test revision, including conversational-answer tests, still requires a completed successful workflow run. Do not describe the current revision as passing until its run is complete and reviewed.
 
 The current authored suite contains:
 
@@ -15,7 +15,8 @@ The current authored suite contains:
 | `tests/test_end_to_end.py` | Complete consultation scenarios and explanation contract | 11 |
 | `tests/test_history.py` | Session snapshots, provenance, JSON/CSV/HTML exports and output safety | 9 |
 | `tests/test_multi_appliance.py` | Independent appliance calculations, household totals, tariff cost, safety and input validation | 8 |
-| **Total** | | **64** |
+| `tests/test_natural_response.py` | Conversational answers, missing evidence, household comparisons, cost caveats and safety referrals | 6 |
+| **Total** | | **70** |
 
 ## Run locally or after deployment
 
