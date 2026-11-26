@@ -144,8 +144,9 @@ def generate_natural_language_answer(
                 "per kWh if you also want an estimated variable cost."
             )
         return (
-            "I can't find a supported answer to that question in my current knowledge base. "
-            "It covers household appliance energy estimates, user-entered tariff-based "
+            "That topic is not covered by this knowledge base. I can't provide a supported "
+            "answer to that question. The advisor covers household appliance energy estimates, "
+            "user-entered tariff-based "
             "variable cost, required inputs and formulas, standby consumption, verified "
             "efficiency-label comparisons, usage-schedule review and basic electrical-safety "
             "referral. I won't guess beyond that scope."
