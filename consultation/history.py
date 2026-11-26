@@ -16,6 +16,17 @@ from datetime import datetime, timezone
 from typing import Any
 
 
+class SafeDictWriter(csv.DictWriter):
+    """Neutralize spreadsheet formula prefixes in untrusted text cells."""
+
+    def writerow(self, rowdict):
+        safe_row = {
+            key: ("'" + value if isinstance(value, str) and value.startswith(("=", "+", "-", "@", "\t", "\r")) else value)
+            for key, value in rowdict.items()
+        }
+        super().writerow(safe_row)
+
+
 def _json_safe(value: Any) -> Any:
     """Convert supported Python values into JSON-safe primitives."""
     if value is None or isinstance(value, (str, int, float, bool)):
@@ -73,7 +84,7 @@ def export_csv(entry: dict[str, Any]) -> str:
         "record_type", "record_id", "label", "value", "unit",
         "status", "source", "note", "details",
     ]
-    writer = csv.DictWriter(output, fieldnames=columns)
+    writer = SafeDictWriter(output, fieldnames=columns)
     writer.writeheader()
     result = entry.get("result", {})
 
