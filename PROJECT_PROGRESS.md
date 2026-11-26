@@ -17,8 +17,8 @@
 | 4 | Lightweight natural-language processing | **Implemented; runtime verification deferred until deployment** |
 | 5 | Consultation and response engine | **Implemented; runtime verification deferred until deployment** |
 | 6 | Streamlit professional UI | **Implemented; runtime verification deferred until deployment** |
-| 7 | Knowledge-base management | Next |
-| 8 | Explainability, validation and automated testing | Not started |
+| 7 | Knowledge-base management | **Implemented; runtime verification deferred until deployment** |
+| 8 | Explainability, validation and automated testing | Next |
 | 9 | History, reports and exports | Not started |
 | 10 | Final audit, documentation and deployment readiness | Not started |
 
@@ -66,23 +66,29 @@
 
 ## Phase 6 — Streamlit user interface
 
+- Added root entry point `app.py`, Streamlit dependency, theme configuration and `docs/STREAMLIT_UI.md`.
+- Added natural-language input, explicit candidate review, structured fact entry, missing-information prompts and assessment results.
+- Added findings, evidence status, conflicts, fired-rule explanations, limitations, recommendations and safety notices.
+- Disclosed variable-cost estimate limitations, lack of guaranteed savings and electrical safety boundaries.
+- Kept reasoning and consultation logic in independent packages.
+
+## Phase 7 — Knowledge-base management
+
 ### Deliverables
-- Added root entry point `app.py` and pinned the Streamlit dependency in `requirements.txt`.
-- Added a Streamlit theme configuration in `.streamlit/config.toml`.
-- Added a natural-language description form and explicit candidate review controls. Negated candidates are labelled to make their review semantics clear.
-- Added a structured fact-entry form generated from the existing fact catalogue, including numeric, string, boolean and enumerated values.
-- Added missing-information prompts for monthly energy, variable cost and standby estimates.
-- Added result presentation for rule-supported findings, caveats, evidence status, conflicts, explanations, limitations, recommendations and safety notices.
-- Added clear disclosures that cost is a variable estimate rather than the complete bill, savings are not guaranteed, and the app does not diagnose electrical faults.
-- Kept the reasoning and consultation logic in the existing independent packages; the UI is a presentation layer.
-- Updated the README and added `docs/STREAMLIT_UI.md` with local run and Community Cloud deployment guidance.
+- Added `knowledge_base/manager.py` and package exports for loading and validating the five editable knowledge-base documents.
+- Added JSON Schema Draft 2020-12 validation using the `jsonschema` dependency.
+- Added cross-file checks for duplicate IDs, category/fact/conclusion/recommendation references, operator and fact-type compatibility, enum values, numeric thresholds, recommendation linkage and prerequisite dependency cycles.
+- Added an explicit formula allow-list. Formula metadata is compared against known supported formula strings and is never executed.
+- Added a Streamlit Knowledge-Base Management section. Users can edit JSON or upload a replacement into a session-only draft, validate the complete set and download a ZIP bundle only when validation succeeds.
+- The management UI does not overwrite active knowledge-base files or commit changes to GitHub. Repository changes must be reviewed and committed through the normal Git workflow.
+- Added six knowledge-base validation tests and `docs/KNOWLEDGE_BASE_MANAGEMENT.md`.
 
 ### Verification status
-- Phase 6 source and documentation files were committed and fetched back from GitHub for review.
-- The app has not been launched and no automated tests have been run, in accordance with the developer's plan to test after deployment.
-- Phases 3–5 still contain 26 authored tests; their execution remains deferred. No test-pass claim is made.
-- Consultation state remains session-only and is not stored in a database.
+- Phase 7 source, UI, requirements and documentation files were fetched back from GitHub for review.
+- The Streamlit app and automated test suites have not been executed. Testing remains deferred until deployment, as requested; no test-pass claim is made.
+- The repository now contains 32 authored tests across inference (9), NLP (9), consultation (8) and knowledge-base validation (6). None have been run in this environment.
+- Draft management is session-only; exported changes require manual review and a Git commit.
 
 ## Current next phase
 
-**Phase 7 — Knowledge-base management.** Add safe, validated workflows for reviewing and maintaining the JSON knowledge base. Do not begin Phase 8 until Phase 7 is completed and documented.
+**Phase 8 — Explainability, validation and automated testing.** Improve end-to-end validation, test coverage and user-facing explanations. Do not begin Phase 9 until Phase 8 is completed and documented.
