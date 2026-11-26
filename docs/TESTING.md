@@ -13,7 +13,8 @@ The current authored suite contains:
 | `tests/test_consultation.py` | Candidate review, structured facts, missing questions and response assembly | 8 |
 | `tests/test_knowledge_base.py` | JSON Schema and cross-file validation | 6 |
 | `tests/test_end_to_end.py` | Complete consultation scenarios and explanation contract | 10 |
-| **Total** | | **42** |
+| `tests/test_history.py` | Session snapshots, provenance, JSON/CSV/HTML exports and output safety | 8 |
+| **Total** | | **50** |
 
 ## Run locally or after deployment
 
