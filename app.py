@@ -78,6 +78,11 @@ with st.sidebar:
     )
 
 st.subheader("1. Describe your appliance or concern")
+st.caption(
+    "Natural-language extraction currently handles one appliance profile at a time. "
+    "For several different appliances, assess each appliance separately; do not combine "
+    "different wattages and runtimes into one profile."
+)
 with st.form("description_form", clear_on_submit=True):
     description = st.text_area(
         "Describe the appliance, its power rating, usage and any concern",
