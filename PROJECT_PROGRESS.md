@@ -19,7 +19,7 @@
 | 6 | Streamlit professional UI | **Implemented; runtime verification deferred until deployment** |
 | 7 | Knowledge-base management | **Implemented; runtime verification deferred until deployment** |
 | 8 | Explainability, validation and automated testing | **Implemented; runtime verification deferred until deployment** |
-| 9 | History, reports and exports | Next |
+| 9 | History, reports and exports | **Implemented; runtime verification deferred until deployment** |
 | 10 | Final audit, documentation and deployment readiness | Not started |
 
 ## Phase 1 — Repository audit and architecture
@@ -87,9 +87,21 @@
 - Added `docs/EXPLAINABILITY.md` defining the user-facing evidence states, trace fields, explanation contract, calculation disclosures and safety boundaries.
 - Added ten end-to-end consultation scenarios in `tests/test_end_to_end.py`, covering energy/cost calculations, missing tariff, explicit candidate review, conflicting and uncertain evidence, standby-specific power, safety referral, flexible schedules, energy labels and provenance.
 - Added `docs/TESTING.md` with test commands, acceptance criteria and regression/safety review guidance.
-- The complete authored test suite now contains 42 tests: inference (9), NLP (9), consultation (8), knowledge-base validation (6) and end-to-end scenarios (10).
+- The complete authored test suite now contains 50 tests: inference (9), NLP (9), consultation (8), knowledge-base validation (6), end-to-end scenarios (10) and history/report exports (8).
 - Tests have not been executed. Runtime verification remains deferred until Streamlit deployment, as requested; no test-pass claim is made.
 - Existing inference traces and consultation responses were retained as the explanation source; the UI is not permitted to invent independent conclusions or recommendations.
+
+## Phase 9 — History, reports and exports
+
+- Added `consultation/history.py` to create immutable JSON-safe snapshots of completed assessments with unique IDs, UTC timestamps, evidence values, status and provenance, plus full rule-supported results.
+- Added a session-scoped history panel in Streamlit. It retains the latest 25 assessments, supports viewing a previous assessment, deleting one entry and clearing the session history.
+- Added individual JSON and CSV exports plus a self-contained printable HTML report. Users can print the HTML report or save it as PDF from their browser. Added a JSON export of the full active-session history.
+- Reports include conclusions, caveats, evidence, fired-rule explanations, limitations, recommendations, conflicts and safety notices. Raw natural-language paragraphs are not copied into report snapshots.
+- Hardened dynamic HTML output with HTML escaping and CSV exports against spreadsheet formula injection. Added eight history/export regression tests.
+- Added `docs/HISTORY_AND_REPORTS.md` describing the lifecycle, privacy, export formats and limitations.
+- Deliberately did not add SQLite or local-file persistence: Streamlit Community Cloud does not guarantee local filesystem persistence. Durable multi-session history requires a separately configured persistent storage service and an explicit privacy/retention design.
+- History and exports are generated in memory. No reports are stored on the app server; downloaded files are under the user's control.
+- Tests are authored but not executed, consistent with the agreed post-deployment verification plan.
 
 ## Verification status
 
@@ -100,4 +112,4 @@
 
 ## Current next phase
 
-**Phase 9 — History, reports and exports.** Add carefully scoped consultation history and user-facing report/export functionality while preserving privacy and clear persistence disclosures. Do not begin Phase 10 until Phase 9 is completed and documented.
+**Phase 10 — Final audit, documentation and deployment readiness.** Perform final source review, resolve identified integration issues, verify deployment configuration, and run the complete test suite after deployment/runtime access is available.
