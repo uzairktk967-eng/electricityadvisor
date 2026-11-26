@@ -1,26 +1,155 @@
 {
   "version": "1.0.0",
   "phrases": [
-    {"phrase": "burning smell", "fact": "supply.has_electrical_symptom", "type": "boolean", "value": true},
-    {"phrase": "smoke", "fact": "supply.has_electrical_symptom", "type": "boolean", "value": true},
-    {"phrase": "sparks", "fact": "supply.has_electrical_symptom", "type": "boolean", "value": true},
-    {"phrase": "electric shock", "fact": "supply.has_electrical_symptom", "type": "boolean", "value": true},
-    {"phrase": "hot outlet", "fact": "supply.has_electrical_symptom", "type": "boolean", "value": true},
-    {"phrase": "hot wiring", "fact": "supply.has_electrical_symptom", "type": "boolean", "value": true},
-    {"phrase": "breaker keeps tripping", "fact": "supply.has_electrical_symptom", "type": "boolean", "value": true},
-    {"phrase": "energy label", "fact": "appliance.has_energy_label", "type": "boolean", "value": true},
-    {"phrase": "manufacturer specification", "fact": "appliance.has_energy_label", "type": "boolean", "value": true},
-    {"phrase": "flexible schedule", "fact": "usage.schedule_flexible", "type": "boolean", "value": true},
-    {"phrase": "can shift usage", "fact": "usage.schedule_flexible", "type": "boolean", "value": true},
-    {"phrase": "cannot shift usage", "fact": "usage.schedule_flexible", "type": "boolean", "value": false},
-    {"phrase": "refrigerator", "fact": "appliance.name", "type": "string", "value": "refrigerator"},
-    {"phrase": "fridge", "fact": "appliance.name", "type": "string", "value": "refrigerator"},
-    {"phrase": "air conditioner", "fact": "appliance.name", "type": "string", "value": "air conditioner"},
-    {"phrase": "ac", "fact": "appliance.name", "type": "string", "value": "air conditioner"},
-    {"phrase": "ceiling fan", "fact": "appliance.name", "type": "string", "value": "ceiling fan"},
-    {"phrase": "washing machine", "fact": "appliance.name", "type": "string", "value": "washing machine"},
-    {"phrase": "water heater", "fact": "appliance.name", "type": "string", "value": "water heater"},
-    {"phrase": "television", "fact": "appliance.name", "type": "string", "value": "television"},
-    {"phrase": "tv", "fact": "appliance.name", "type": "string", "value": "television"}
+    {
+      "phrase": "burning smell",
+      "fact": "supply.has_electrical_symptom",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "smoke",
+      "fact": "supply.has_electrical_symptom",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "sparks",
+      "fact": "supply.has_electrical_symptom",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "electric shock",
+      "fact": "supply.has_electrical_symptom",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "hot outlet",
+      "fact": "supply.has_electrical_symptom",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "hot wiring",
+      "fact": "supply.has_electrical_symptom",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "breaker keeps tripping",
+      "fact": "supply.has_electrical_symptom",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "energy label",
+      "fact": "appliance.has_energy_label",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "manufacturer specification",
+      "fact": "appliance.has_energy_label",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "flexible schedule",
+      "fact": "usage.schedule_flexible",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "can shift usage",
+      "fact": "usage.schedule_flexible",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "cannot shift usage",
+      "fact": "usage.schedule_flexible",
+      "type": "boolean",
+      "value": false
+    },
+    {
+      "phrase": "refrigerator",
+      "fact": "appliance.name",
+      "type": "string",
+      "value": "refrigerator"
+    },
+    {
+      "phrase": "fridge",
+      "fact": "appliance.name",
+      "type": "string",
+      "value": "refrigerator"
+    },
+    {
+      "phrase": "air conditioner",
+      "fact": "appliance.name",
+      "type": "string",
+      "value": "air conditioner"
+    },
+    {
+      "phrase": "ac",
+      "fact": "appliance.name",
+      "type": "string",
+      "value": "air conditioner"
+    },
+    {
+      "phrase": "ceiling fan",
+      "fact": "appliance.name",
+      "type": "string",
+      "value": "ceiling fan"
+    },
+    {
+      "phrase": "washing machine",
+      "fact": "appliance.name",
+      "type": "string",
+      "value": "washing machine"
+    },
+    {
+      "phrase": "water heater",
+      "fact": "appliance.name",
+      "type": "string",
+      "value": "water heater"
+    },
+    {
+      "phrase": "television",
+      "fact": "appliance.name",
+      "type": "string",
+      "value": "television"
+    },
+    {
+      "phrase": "tv",
+      "fact": "appliance.name",
+      "type": "string",
+      "value": "television"
+    },
+    {
+      "phrase": "schedule is flexible",
+      "fact": "usage.schedule_flexible",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "schedule can be shifted",
+      "fact": "usage.schedule_flexible",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "i can shift usage",
+      "fact": "usage.schedule_flexible",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "phrase": "cannot shift the schedule",
+      "fact": "usage.schedule_flexible",
+      "type": "boolean",
+      "value": false
+    }
   ]
 }
