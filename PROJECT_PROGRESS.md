@@ -18,8 +18,8 @@
 | 5 | Consultation and response engine | **Implemented; runtime verification deferred until deployment** |
 | 6 | Streamlit professional UI | **Implemented; runtime verification deferred until deployment** |
 | 7 | Knowledge-base management | **Implemented; runtime verification deferred until deployment** |
-| 8 | Explainability, validation and automated testing | Next |
-| 9 | History, reports and exports | Not started |
+| 8 | Explainability, validation and automated testing | **Implemented; runtime verification deferred until deployment** |
+| 9 | History, reports and exports | Next |
 | 10 | Final audit, documentation and deployment readiness | Not started |
 
 ## Phase 1 — Repository audit and architecture
@@ -53,7 +53,7 @@
 - Candidates retain source text, matched text, evidence status, confidence indicator and notes.
 - Uncertainty and local negation are handled conservatively. Extraction does not write facts or run inference.
 - Added nine NLP tests and `docs/NLP.md`.
-- Tests are authored but not executed; runtime verification is deferred until Streamlit deployment.
+- Tests are authored but not executed; runtime verification is deferred until deployment.
 
 ## Phase 5 — Consultation and response engine
 
@@ -74,7 +74,6 @@
 
 ## Phase 7 — Knowledge-base management
 
-### Deliverables
 - Added `knowledge_base/manager.py` and package exports for loading and validating the five editable knowledge-base documents.
 - Added JSON Schema Draft 2020-12 validation using the `jsonschema` dependency.
 - Added cross-file checks for duplicate IDs, category/fact/conclusion/recommendation references, operator and fact-type compatibility, enum values, numeric thresholds, recommendation linkage and prerequisite dependency cycles.
@@ -83,12 +82,22 @@
 - The management UI does not overwrite active knowledge-base files or commit changes to GitHub. Repository changes must be reviewed and committed through the normal Git workflow.
 - Added six knowledge-base validation tests and `docs/KNOWLEDGE_BASE_MANAGEMENT.md`.
 
-### Verification status
-- Phase 7 source, UI, requirements and documentation files were fetched back from GitHub for review.
-- The Streamlit app and automated test suites have not been executed. Testing remains deferred until deployment, as requested; no test-pass claim is made.
-- The repository now contains 32 authored tests across inference (9), NLP (9), consultation (8) and knowledge-base validation (6). None have been run in this environment.
-- Draft management is session-only; exported changes require manual review and a Git commit.
+## Phase 8 — Explainability, validation and automated testing
+
+- Added `docs/EXPLAINABILITY.md` defining the user-facing evidence states, trace fields, explanation contract, calculation disclosures and safety boundaries.
+- Added ten end-to-end consultation scenarios in `tests/test_end_to_end.py`, covering energy/cost calculations, missing tariff, explicit candidate review, conflicting and uncertain evidence, standby-specific power, safety referral, flexible schedules, energy labels and provenance.
+- Added `docs/TESTING.md` with test commands, acceptance criteria and regression/safety review guidance.
+- The complete authored test suite now contains 42 tests: inference (9), NLP (9), consultation (8), knowledge-base validation (6) and end-to-end scenarios (10).
+- Tests have not been executed. Runtime verification remains deferred until Streamlit deployment, as requested; no test-pass claim is made.
+- Existing inference traces and consultation responses were retained as the explanation source; the UI is not permitted to invent independent conclusions or recommendations.
+
+## Verification status
+
+- Phase 7 management code, UI and documentation were fetched back from GitHub during its implementation.
+- Phase 8 test and documentation files were committed to the default branch.
+- No application runtime, browser interaction or automated test execution has been performed in this workflow.
+- Knowledge-base drafts remain session-only and require manual review and a Git commit to change active repository data.
 
 ## Current next phase
 
-**Phase 8 — Explainability, validation and automated testing.** Improve end-to-end validation, test coverage and user-facing explanations. Do not begin Phase 9 until Phase 8 is completed and documented.
+**Phase 9 — History, reports and exports.** Add carefully scoped consultation history and user-facing report/export functionality while preserving privacy and clear persistence disclosures. Do not begin Phase 10 until Phase 9 is completed and documented.
