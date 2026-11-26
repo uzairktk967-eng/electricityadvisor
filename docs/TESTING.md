@@ -14,7 +14,7 @@ The current authored suite contains:
 | `tests/test_knowledge_base.py` | JSON Schema and cross-file validation | 6 |
 | `tests/test_end_to_end.py` | Complete consultation scenarios and explanation contract | 10 |
 | `tests/test_history.py` | Session snapshots, provenance, JSON/CSV/HTML exports and output safety | 8 |
-| **Total** | | **50** |
+| **Total** | | **51** |
 
 ## Run locally or after deployment
 
@@ -54,6 +54,8 @@ Streamlit Community Cloud deployment does not itself execute the repository's un
 - [ ] JSON, CSV and printable HTML reports contain the expected facts, findings and disclosures.
 - [ ] HTML report values are escaped and CSV formula-like text is neutralized.
 - [ ] Exporting reports does not cause an unintended assessment rerun or duplicate history entry.
+- [ ] Integer structured facts are submitted as integers and accepted by fact validation.
+- [ ] CSV formula-like text remains neutralized when whitespace precedes the formula marker.
 
 ## Regression and safety review
 
