@@ -32,7 +32,7 @@ Project identity should be stored centrally in a configuration module during imp
 | `expert_system/` | Fact model, rule matcher, forward chaining, backward chaining and conflict resolution |
 | `nlp/` | Text normalization, tokenization, controlled phrase mapping, negation and uncertainty handling |
 | `consultation/` | Dialogue state, evidence confirmation, missing-information questions and response assembly |
-| `explainability/` | Rule evaluation log, inference trace and human-readable explanations |
+| `explainability/` | Inference trace and human-readable explanations |
 | `validation/` | Knowledge-base schema, reference, duplicate and consistency checks |
 | `reports/` | Consultation/test report generation and export helpers |
 | `storage/` | Session/history persistence adapter, with a documented lightweight backend |
@@ -43,14 +43,13 @@ Project identity should be stored centrally in a configuration module during imp
 ## 4. Intended consultation data flow
 
 1. The user describes an electricity-use concern and provides appliance and usage details.
-2. The NLP layer extracts candidate facts with confidence/ambiguity metadata; it does not decide conclusions.
+2. NLP extracts candidate facts with confidence/ambiguity metadata; it does not decide conclusions.
 3. The consultation layer asks focused questions for missing or ambiguous evidence and requests confirmation of extracted candidates.
 4. Confirmed and rejected evidence is stored as explicit facts with provenance.
-5. The inference engine matches validated rules and derives conclusions using forward chaining; backward chaining can identify evidence needed for a requested hypothesis.
+5. The inference engine matches validated rules and derives conclusions using forward chaining; backward chaining identifies evidence needed for a requested hypothesis.
 6. Conflict handling applies documented priorities and reports unresolved conflicts rather than hiding them.
-7. The explanation layer reports the evidence, rules evaluated, rules fired and resulting conclusions.
-8. The response layer formats only those conclusions and recommendations returned by the inference engine.
-9. The UI presents the consultation and trace; optional history/report services store or export it.
+7. The response layer returns conclusions, fired rules, explanations, limitations, rule-linked recommendations, evidence status and safety notices.
+8. The UI presents the consultation and trace; optional history/report services store or export it.
 
 ## 5. Core data concepts
 
@@ -65,13 +64,21 @@ Project identity should be stored centrally in a configuration module during imp
 ## 6. Inference design
 
 - **Forward chaining:** Start from confirmed facts, repeatedly fire applicable rules until no new facts are derived or a documented stopping condition is reached.
-- **Backward chaining:** Start from a target conclusion and recursively identify rules and prerequisite facts that could establish it.
+- **Backward chaining:** Start from a target conclusion and recursively identify evidence needed to establish it.
 - **Rule matching:** Evaluate conditions against explicit facts; missing or uncertain evidence must not be treated as true.
 - **Conflict resolution:** Use explicit priority and a deterministic tie policy; retain an audit trace of competing rules.
 - **Multiple conclusions:** Permit multiple independently supported conclusions in one consultation.
 - **Contradictions:** Preserve conflicting evidence and surface it for clarification; do not silently choose one value.
 
-## 7. Initial technology choices
+## 7. Consultation design
+
+- NLP candidates remain separate from the fact store until the user explicitly reviews them.
+- Direct structured inputs pass through the fact catalogue's type and range validation.
+- Backward chaining maps missing fact IDs to focused questions.
+- The response assembler exposes only conclusions and recommendations emitted by fired knowledge-base rules.
+- The current consultation session is in-memory only; durable history is a later concern.
+
+## 8. Initial technology choices
 
 - Python for application and reasoning logic.
 - Streamlit for the user interface.
@@ -82,18 +89,19 @@ Project identity should be stored centrally in a configuration module during imp
 
 No paid API or hosted service is required for core reasoning.
 
-## 8. Quality and safety boundaries
+## 9. Quality and safety boundaries
 
-Electricity estimates depend on appliance wattage, operating time, quantity and applicable tariff assumptions. The system must distinguish user-provided measurements from estimates and disclose assumptions. It should avoid presenting estimated savings as guaranteed bill reductions. Electrical installation, wiring faults and hazardous repair advice are outside the scope of ordinary energy-saving recommendations; users should be directed to a qualified electrician for such issues.
+Electricity estimates depend on appliance wattage, operating time, quantity and tariff assumptions. The system must distinguish user-provided measurements from estimates and disclose assumptions. Estimated savings are not guaranteed bill reductions. Electrical installation, wiring faults and hazardous repair advice are outside the scope of ordinary energy-saving recommendations; users should be directed to a qualified electrician for such issues.
 
 The NLP package uses a limited deterministic vocabulary and explicit patterns. It may miss paraphrases or ambiguous wording. It must return candidates for user confirmation and must not present its confidence indicator as a calibrated probability.
 
-## 9. Phase boundaries and verification
+## 10. Phase boundaries and verification
 
 - **Phase 1:** Audit and architecture — complete.
 - **Phase 2:** Engineer and structurally validate the JSON knowledge base — complete.
 - **Phase 3:** Implement the independent symbolic inference engine — implemented; runtime verification deferred until Streamlit deployment at the developer's request.
 - **Phase 4:** Implement constrained, explainable lightweight NLP — implemented; runtime verification deferred until Streamlit deployment.
-- **Phase 5 onward:** Build consultation, UI, management, explainability, validation, reporting and deployment capabilities in sequence.
+- **Phase 5:** Implement consultation orchestration and response assembly — implemented; runtime verification deferred until Streamlit deployment.
+- **Phase 6 onward:** Build the Streamlit UI, knowledge-base management, validation, reports and deployment capabilities in sequence.
 
 A component is implemented only when its source code and documentation exist. Test execution status must be reported separately; authored tests must never be described as passing until they have actually run.
