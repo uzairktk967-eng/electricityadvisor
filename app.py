@@ -403,7 +403,7 @@ with st.expander("Knowledge-base Management", expanded=False):
                 for filename in document_names:
                     archive.writestr(
                         filename,
-                        json.dumps(st.session_state.kb_draft[filename], indent=2, ensure_ascii=False) + "\\n",
+                        json.dumps(st.session_state.kb_draft[filename], indent=2, ensure_ascii=False) + "\n",
                     )
                 archive.writestr(
                     "schema.json",
@@ -411,8 +411,8 @@ with st.expander("Knowledge-base Management", expanded=False):
                 )
                 archive.writestr(
                     "VALIDATION.txt",
-                    "Knowledge-base draft passed JSON Schema and cross-file semantic validation.\\n"
-                    "Review the changes and apply them through the repository's normal Git workflow.\\n",
+                    "Knowledge-base draft passed JSON Schema and cross-file semantic validation.\n"
+                    "Review the changes and apply them through the repository's normal Git workflow.\n",
                 )
             st.download_button(
                 "Download validated knowledge-base bundle",
