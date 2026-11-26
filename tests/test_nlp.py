@@ -76,6 +76,12 @@ class ExtractionTests(unittest.TestCase):
         self.assertIn(("usage.hours_per_day", 4.5), pairs)
         self.assertIn(("usage.days_per_month", 28), pairs)
 
+    def test_domain_phrases_match_next_to_punctuation(self):
+        facts = extract_facts("There are sparks, and my schedule is flexible.")
+        pairs = {(item.fact_id, item.value) for item in facts}
+        self.assertIn(("supply.has_electrical_symptom", True), pairs)
+        self.assertIn(("usage.schedule_flexible", True), pairs)
+
 
 if __name__ == "__main__":
     unittest.main()
