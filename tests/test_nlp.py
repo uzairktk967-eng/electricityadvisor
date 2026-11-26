@@ -48,6 +48,34 @@ class ExtractionTests(unittest.TestCase):
         candidate = next(item for item in facts if item.fact_id == "usage.schedule_flexible")
         self.assertTrue(candidate.value)
 
+    def test_common_paraphrases_for_single_appliance(self):
+        facts = extract_facts(
+            "My fan is rated at 80 W. It runs 10 hours daily. "
+            "I have one fan and use it for 30 days per month. "
+            "My electricity tariff is Rs. 55 per kWh."
+        )
+        pairs = {(item.fact_id, item.value) for item in facts}
+        self.assertIn(("appliance.rated_power_w", 80), pairs)
+        self.assertIn(("usage.hours_per_day", 10), pairs)
+        self.assertIn(("appliance.quantity", 1), pairs)
+        self.assertIn(("usage.days_per_month", 30), pairs)
+        self.assertIn(("tariff.price_per_kwh", 55), pairs)
+
+    def test_word_quantity_is_normalized(self):
+        facts = extract_facts("I have two fans.")
+        self.assertIn(
+            ("appliance.quantity", 2),
+            {(item.fact_id, item.value) for item in facts},
+        )
+
+    def test_daily_and_monthly_paraphrases(self):
+        facts = extract_facts(
+            "The appliance operates for 4.5 hours a day and is used for 28 days in the month."
+        )
+        pairs = {(item.fact_id, item.value) for item in facts}
+        self.assertIn(("usage.hours_per_day", 4.5), pairs)
+        self.assertIn(("usage.days_per_month", 28), pairs)
+
 
 if __name__ == "__main__":
     unittest.main()
