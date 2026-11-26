@@ -67,5 +67,69 @@ class NaturalResponseTests(unittest.TestCase):
         self.assertIn("qualified electrician", answer)
         self.assertIn("Do not", answer)
 
+
+    def test_general_kwh_definition_without_assessment(self):
+        answer = generate_natural_language_answer("What does one kWh mean?", None)
+        self.assertIn("one electricity unit", answer)
+
+    def test_calculation_method_without_assessment(self):
+        answer = generate_natural_language_answer("How do you calculate monthly electricity consumption?", None)
+        self.assertIn("rated power", answer)
+        self.assertIn("÷ 1,000", answer)
+
+    def test_required_inputs_without_assessment(self):
+        answer = generate_natural_language_answer("What information do you need to calculate my usage?", None)
+        self.assertIn("quantity", answer)
+        self.assertIn("tariff", answer)
+
+    def test_standby_requires_separate_standby_power(self):
+        answer = generate_natural_language_answer("How is standby electricity calculated?", None)
+        self.assertIn("standby mode", answer)
+        self.assertIn("must not be assumed", answer)
+
+    def test_full_bill_scope_is_explained(self):
+        answer = generate_natural_language_answer("Does this calculate my full electricity bill?", None)
+        self.assertIn("complete utility bill", answer)
+
+    def test_efficiency_question_is_grounded_in_labels(self):
+        answer = generate_natural_language_answer("How can I compare appliance efficiency?", None)
+        self.assertIn("verified energy labels", answer)
+
+    def test_confirmed_inputs_are_reported(self):
+        result = {
+            "evidence": {
+                "appliance.rated_power_w": {"status": "confirmed", "value": 100},
+                "appliance.quantity": {"status": "confirmed", "value": 2},
+                "usage.hours_per_day": {"status": "confirmed", "value": 5},
+                "usage.days_per_month": {"status": "confirmed", "value": 30},
+                "tariff.price_per_kwh": {"status": "confirmed", "value": 55},
+            },
+            "conclusions": {},
+            "recommendations": [],
+            "conflicts": [],
+            "safety_notice": None,
+        }
+        answer = generate_natural_language_answer("Show my confirmed inputs", result)
+        self.assertIn("100 W", answer)
+        self.assertIn("2", answer)
+        self.assertIn("55 Rs./kWh", answer)
+
+    def test_unknown_topic_is_explicitly_outside_knowledge_base(self):
+        answer = generate_natural_language_answer("Who will win the next cricket world cup?", None)
+        self.assertIn("not covered by this knowledge base", answer)
+
+    def test_unknown_question_after_assessment_does_not_guess(self):
+        result = {
+            "conclusions": {},
+            "evidence": {},
+            "recommendations": [],
+            "conflicts": [],
+            "safety_notice": None,
+        }
+        answer = generate_natural_language_answer("What is the best mobile phone?", result)
+        self.assertIn("current knowledge base", answer)
+        self.assertIn("I won't guess", answer)
+
+
 if __name__ == "__main__":
     unittest.main()
