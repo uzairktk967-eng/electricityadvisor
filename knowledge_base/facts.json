@@ -11,7 +11,7 @@
     },
     {
       "id": "appliance.quantity",
-      "type": "number",
+      "type": "integer",
       "unit": "count",
       "description": "Number of equivalent appliances.",
       "evidence": "user_input",
