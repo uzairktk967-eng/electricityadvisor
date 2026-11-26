@@ -68,8 +68,8 @@ NUMERIC_PATTERNS = {
     ),
     "tariff.price_per_kwh": re.compile(
         rf"(?:tariff|rate|price)(?:\s+is|\s+of|\s*:|\s*=)?\s*"
-        rf"(?:rs\s*)?(?:rupees?\s*)?{NUMBER}\s*"
-        rf"(?:rs\s*)?(?:rupees?\s*)?(?:per\s*)?(?:kwh|unit)\b"
+        rf"(?:rs\.?\s*)?(?:rupees?\s*)?{NUMBER}\s*"
+        rf"(?:rs\.?\s*)?(?:rupees?\s*)?(?:per\s*)?(?:kwh|unit)\b"
     ),
 }
 
