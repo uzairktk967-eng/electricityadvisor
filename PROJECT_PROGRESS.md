@@ -119,8 +119,9 @@
 
 - Investigated the live-use report where a natural-language appliance description produced no extracted facts.
 - Expanded deterministic numeric phrase patterns to recognize common single-appliance wording: “rated at 80 W”, “runs 10 hours daily”, “operates for 4.5 hours a day”, simple number-word quantities, days-per-month wording and Pakistani rupee tariff phrasing.
-- Added three NLP regression tests covering common paraphrases, word quantities and daily/monthly usage wording. The authored test count is now 54; tests have not yet been executed.
-- Corrected the knowledge-base type for appliance quantity from a general number to an integer, so fractional appliance counts are rejected and the Streamlit integer input path is used.
+- Added three NLP regression tests covering common paraphrases, word quantities and daily/monthly usage wording. The authored test count is now 56; tests have not yet been executed.
+- Corrected the knowledge-base type for appliance quantity from a general number to an integer, so fractional appliance counts are rejected and the Streamlit integer input path is used; added a regression test.
+- Fixed phrase matching at punctuation boundaries and added flexible-schedule paraphrases, addressing a pre-existing mismatch between the NLP test expectation and the phrase catalogue.
 - Added a visible UI limitation notice: the current fact model safely supports one appliance profile at a time. Multiple different appliances cannot yet be represented as independent rows; combining them in one paragraph could incorrectly associate wattage/runtime values.
 - Updated NLP documentation to state the expanded phrase coverage and the single-appliance boundary.
 - Remaining work: implement a properly separated multi-appliance workflow, audit other input/engine/UI/report edge cases, execute regression tests, fix failures, and repeat the live acceptance checks.
